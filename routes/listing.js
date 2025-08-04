@@ -24,11 +24,29 @@ router
 //create - this must come before /:id route
 router.get("/new",isloggedin,listingController.rendernewform);
 
+router.get("/search", async (req, res) => {
+    let query = req.query.q;
+    if (!query) {
+        return res.redirect("/listings");
+    }
+
+    const listings = await Listing.find({
+        $or: [
+            { country: { $regex: query, $options: "i" } },
+            { location: { $regex: query, $options: "i" } },
+            { title: { $regex: query, $options: "i" } }
+        ]
+    });
+
+    res.render("listings/index.ejs", { allist: listings });
+});
 router
 .route("/:id")
 .get(wrapAsync (listingController.showlisting))
 .put(isloggedin,isOwner,upload.single('listing[image]'),validateListing,wrapAsync(listingController.updatelisting))
 .delete(isloggedin,isOwner,wrapAsync(listingController.deletelisting));
+
+
 
 
 

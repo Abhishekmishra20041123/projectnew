@@ -1,15 +1,30 @@
 const Joi = require("joi");
 //server side validation
+
 module.exports.listingSchema = Joi.object({
-    listing:Joi.object({       //this show listing object is required
-        title:Joi.string().required(),
-        description:Joi.string().required(),
-        location:Joi.string().required(),
-        country:Joi.string().required(),
-        price:Joi.number().required().min(0),
-        image:Joi.string().allow("",null)
-    }).required()
+  listing: Joi.object({
+    title: Joi.string().required(),
+    description: Joi.string().required(),
+    location: Joi.string().required(),
+    country: Joi.string().required(),
+    price: Joi.number().required().min(0),
+    image: Joi.string().allow('', null),
+    category: Joi.string().valid(
+      'Trending',
+      'Rooms',
+      'Mountain Cities',
+      'Castles',
+      'Swimming Pools',
+      'Camping Ground',
+      'Cow Farms',
+      'Bus Side',
+      'Sea Beaches',
+      'Vacant',
+      'Hotel'
+    ).required()
+  }).required()
 });
+
 
 module.exports.reviewSchema = Joi.object({
     review:Joi.object({

@@ -35,11 +35,35 @@
             <div class="invalid-feedback">Country should be valid</div>
         </div>
     </div>
-    <div>
+    
+    <div class="row">
+        <div class="col-md-4 mt-4">
+            <label for="category">Category</label>
+<select name="listing[category]" id="category" required>
+  <option disabled selected>Select a category</option>
+  <option value="Trending">Trending</option>
+  <option value="Rooms">Rooms</option>
+  <option value="Mountain Cities">Mountain Cities</option>
+  <option value="Castles">Castles</option>
+  <option value="Swimming Pools">Swimming Pools</option>
+  <option value="Camping Ground">Camping Ground</option>
+  <option value="Cow Farms">Cow Farms</option>
+  <option value="Bus Side">Bus Side</option>
+  <option value="Sea Beaches">Sea Beaches</option>
+  <option value="Vacant">Vacant</option>
+  <option value="Hotel">Hotel</option>
+</select>
+      </div>
+    <div class="col-md-8">
         <label for="location" class="form-label">Location</label>
         <input type="text" name="listing[location]" placeholder="enter location" class="form-control" required>
         <div class="invalid-feedback">Location should be valid</div>
     </div>
+    
+     
+   </div>
+
+
     <br><br>
     <button class="btn btn-dark add-button">Add</button>
 </form>

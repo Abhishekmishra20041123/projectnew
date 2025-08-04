@@ -46,11 +46,32 @@
             </div> 
             <div class="invalid-feedback">Country Should be Valid</div>
         </div>
-        <div>
+        <div class="row">
+            <div class="col-md-2 mt-2">
+                <label for="category">Category</label>
+                <br>
+<select name="listing[category]" id="category" required>
+  <option disabled <%= !listdata.category ? 'selected' : '' %>>Select a category</option>
+  <option value="Trending" <%= listdata.category === 'Trending' ? 'selected' : '' %>>Trending</option>
+  <option value="Rooms" <%= listdata.category === 'Rooms' ? 'selected' : '' %>>Rooms</option>
+  <option value="Mountain Cities" <%= listdata.category === 'Mountain Cities' ? 'selected' : '' %>>Mountain Cities</option>
+  <option value="Castles" <%= listdata.category === 'Castles' ? 'selected' : '' %>>Castles</option>
+  <option value="Swimming Pools" <%= listdata.category === 'Swimming Pools' ? 'selected' : '' %>>Swimming Pools</option>
+  <option value="Camping Ground" <%= listdata.category === 'Camping Ground' ? 'selected' : '' %>>Camping Ground</option>
+  <option value="Cow Farms" <%= listdata.category === 'Cow Farms' ? 'selected' : '' %>>Cow Farms</option>
+  <option value="Bus Side" <%= listdata.category === 'Bus Side' ? 'selected' : '' %>>Bus Side</option>
+  <option value="Sea Beaches" <%= listdata.category === 'Sea Beaches' ? 'selected' : '' %>>Sea Beaches</option>
+  <option value="Vacant" <%= listdata.category === 'Vacant' ? 'selected' : '' %>>Vacant</option>
+  <option value="Hotel" <%= listdata.category === 'Hotel' ? 'selected' : '' %>>Hotel</option>
+</select>
+
+        </div>
+        <div class="col-md-10">
             <label for="location" class="form-label">Location</label>
             <input type="text" name="listing[location]" value="<%=listdata.location%>"class="form-control" required>
             <div class="invalid-feedback">Loctaion Should be Valid</div>
         </div>
+    </div>
         <br><br>
         <button class="btn btn-dark add-button">Submit</button>
     </form>

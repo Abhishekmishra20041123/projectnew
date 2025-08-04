@@ -37,6 +37,23 @@ const listSchema = new Schema({
       type: [Number],
       required: true
     }
+  },
+  category: {
+    type: String,
+    enum: [
+      'Trending',
+      'Rooms',
+      'Mountain Cities',
+      'Castles',
+      'Swimming Pools',
+      'Camping Ground',
+      'Cow Farms',
+      'Bus Side',
+      'Sea Beaches',
+      'Vacant',
+      'Hotel'
+    ],
+    required: true
   }
 });
 

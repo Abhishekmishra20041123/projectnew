@@ -3,10 +3,22 @@ const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
-module.exports.index =  async (req,res)=>{
-   const allist=await Listing.find({});
-    res.render("./listings/index.ejs",{allist});
+module.exports.index = async (req, res) => {
+    const { category } = req.query;
+    let allist;
+
+    if (!category || category.trim() === "") {
+        // No category selected, show all
+        allist = await Listing.find({});
+    } else {
+        // Filter by selected category
+        allist = await Listing.find({ category });
+    }
+
+    res.render("./listings/index.ejs", { allist, category });
 };
+
+
 
 module.exports.rendernewform = (req,res)=>{   //it shouldbe write before /listings/:id this method because then new will act as variable like search in google
     res.render("listings/new.ejs");
@@ -76,4 +88,21 @@ module.exports.deletelisting = async (req,res)=>{
     await Listing.findByIdAndDelete(id);
     req.flash("success","listing Deleted");
     res.redirect("/listings");
+};
+
+module.exports.searchListings = async (req, res) => {
+    let query = req.query.q;
+    if (!query) {
+        return res.redirect("/listings");
+    }
+
+    const listings = await Listing.find({
+        $or: [
+            { country: { $regex: query, $options: "i" } },
+            { location: { $regex: query, $options: "i" } },
+            { title: { $regex: query, $options: "i" } }
+        ]
+    });
+
+    res.render("listings/index.ejs", { allist: listings });
 };
