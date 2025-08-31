@@ -28,6 +28,31 @@
     });
   }
   
+  // Helper function to ensure dropdown stays within viewport
+  function ensureDropdownInViewport(dropdown) {
+    if (!dropdown) return;
+    
+    // Get dropdown dimensions and position
+    const rect = dropdown.getBoundingClientRect();
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    
+    // Check if dropdown extends beyond right edge of viewport
+    if (rect.right > viewportWidth) {
+      console.log('Fixing dropdown position - outside right edge');
+      dropdown.style.right = '0';
+      dropdown.style.left = 'auto';
+    }
+    
+    // Check if dropdown extends beyond bottom of viewport
+    if (rect.bottom > viewportHeight) {
+      console.log('Fixing dropdown height - outside bottom edge');
+      const maxHeight = viewportHeight - rect.top - 20; // 20px buffer
+      dropdown.style.maxHeight = maxHeight + 'px';
+      dropdown.style.overflowY = 'auto';
+    }
+  }
+  
   // Global function to toggle dropdown visibility
   window.toggleDropdown = function(event) {
     event.preventDefault();
@@ -49,6 +74,9 @@
       });
       
       dropdown.classList.add('show');
+      
+      // Ensure dropdown stays within viewport boundaries
+      ensureDropdownInViewport(dropdown);
     }
   };
   

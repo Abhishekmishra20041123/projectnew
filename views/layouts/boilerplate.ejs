@@ -41,11 +41,36 @@
 
   <!-- Dropdown fix - load early -->
   <script src="/js/dropdown-fix.js"></script>
+  
+  <!-- Custom CSS to ensure dropdowns stay within viewport -->
+  <style>
+    /* Fix for dropdowns going outside viewport */
+    .dropdown-menu {
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+    }
+    
+    .dropdown-menu-end {
+      right: 0 !important;
+      left: auto !important;
+    }
+    
+    /* Ensure proper z-index for dropdowns */
+    .dropdown {
+      z-index: 9999;
+    }
+    
+    /* Ensure dropdown items are properly contained */
+    .dropdown-item {
+      white-space: normal;
+      word-wrap: break-word;
+    }
+  </style>
 </head>
 
 <body>
   <%- include("../includes/navbar.ejs") %>
-    <div class="container" style="margin-bottom: 5px; margin-top: 10px;" >
+    <div class="container" style="margin-bottom: 5px; margin-top: 10px;">
       <%- include("../includes/flash.ejs") %>
         <%- body %>
     </div>
@@ -55,6 +80,58 @@
       <script src="/js/pwa-install.js"></script>
       <script src="/js/navbar-fix.js"></script>
       <script src="/js/booking-response-helper.js"></script>
+      
+      <!-- Additional viewport dropdown fix -->
+      <script>
+        // Function to ensure all dropdowns stay within viewport
+        function checkAllDropdowns() {
+          document.querySelectorAll('.dropdown-menu').forEach(function(dropdown) {
+            // Skip if not visible
+            if (!dropdown.classList.contains('show')) return;
+            
+            // Get dropdown dimensions and position
+            const rect = dropdown.getBoundingClientRect();
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+            
+            // Check if dropdown extends beyond right edge of viewport
+            if (rect.right > viewportWidth) {
+              console.log('Global fix: dropdown outside right edge');
+              dropdown.style.right = '0';
+              dropdown.style.left = 'auto';
+            }
+            
+            // Check if dropdown extends beyond bottom of viewport
+            if (rect.bottom > viewportHeight) {
+              console.log('Global fix: dropdown outside bottom edge');
+              const maxHeight = viewportHeight - rect.top - 20; // 20px buffer
+              dropdown.style.maxHeight = maxHeight + 'px';
+              dropdown.style.overflowY = 'auto';
+            }
+          });
+        }
+        
+        // Monitor window resize events
+        window.addEventListener('resize', function() {
+          checkAllDropdowns();
+        });
+        
+        // Check after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+          checkAllDropdowns();
+          
+          // Add click listeners to dropdown toggles
+          document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+              // Use setTimeout to allow the dropdown to be shown first
+              setTimeout(checkAllDropdowns, 0);
+            });
+          });
+        });
+        
+        // Also check on window load for maximum reliability
+        window.addEventListener('load', checkAllDropdowns);
+      </script>
 
 </body>
 
