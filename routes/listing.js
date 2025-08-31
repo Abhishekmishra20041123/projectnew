@@ -2,27 +2,82 @@ const express = require("express");
 const router = express.Router();
 const Listing = require("../models/listing.js");
 const wrapAsync = require("../utils/wrapAsync.js");
-// const ExpressError=require("../utils/ExpressError.js");
-// const {listingSchema,reviewSchema} = require("../schema.js");
 const {isloggedin,isOwner,validateListing} = require("../middlewear.js");
 const listingController = require("../controllers/listing.js");
 const multer = require("multer");
 const {storage} = require("../cloudConfig.js");
-const upload = multer({storage});
+const upload = multer({
+    storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB limit per file
+        files: 11 // max 11 files total (1 main + 10 additional)
+    },
+    fileFilter: (req, file, cb) => {
+        // Accept images only
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+            return cb(new Error('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+    }
+});
 
+// Multer error handling middleware
+const handleMulterError = (error, req, res, next) => {
+    console.log('Multer error caught:', error);
+    if (error instanceof multer.MulterError) {
+        console.log('Multer error code:', error.code);
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            req.flash('error', 'File too large. Please upload images smaller than 5MB.');
+        } else if (error.code === 'LIMIT_FILE_COUNT') {
+            req.flash('error', 'Too many files. Maximum 11 files allowed.');
+        } else if (error.code === 'LIMIT_UNEXPECTED_FILE') {
+            req.flash('error', 'Unexpected file field detected.');
+        } else {
+            req.flash('error', `Upload error: ${error.message}`);
+        }
+        return res.redirect('/listings'); // Redirect to listings page instead of 'back'
+    } else if (error && error.message === 'Only image files are allowed!') {
+        req.flash('error', 'Only image files (jpg, jpeg, png, gif, webp) are allowed.');
+        return res.redirect('/listings'); // Redirect to listings page instead of 'back'
+    }
+    next(error);
+};
 
-router
-.route("/")
+// Upload middleware with specific field configuration
+// Fix: Use simplified field names without square brackets to match EJS templates
+const uploadFields = upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'additionalImages', maxCount: 10 }
+]);
+
+// Middleware to handle upload errors
+const handleUpload = (req, res, next) => {
+    uploadFields(req, res, (err) => {
+        if (err) {
+            console.log('Upload error in middleware:', err);
+            return handleMulterError(err, req, res, next);
+        }
+        
+        // Log received files for debugging
+        console.log('Files received in middleware:', req.files ? Object.keys(req.files).length : 0);
+        if (req.files) {
+            Object.keys(req.files).forEach((fieldname, index) => {
+                req.files[fieldname].forEach((file, fileIndex) => {
+                    console.log(`File ${index + 1}-${fileIndex + 1}: ${file.fieldname} = ${file.originalname}`);
+                });
+            });
+        }
+        
+        next();
+    });
+};
+
+// Routes
+router.route("/")
 .get(wrapAsync(listingController.index))
-.post(isloggedin
-    ,validateListing
-    ,upload.single('listing[image]'),
-     wrapAsync(listingController.createlisting
-    ));
+    .post(isloggedin, handleUpload, validateListing, wrapAsync(listingController.createlisting));
 
-
-//create - this must come before /:id route
-router.get("/new",isloggedin,listingController.rendernewform);
+router.get("/new", isloggedin, listingController.rendernewform);
 
 router.get("/search", async (req, res) => {
     let query = req.query.q;
@@ -40,47 +95,15 @@ router.get("/search", async (req, res) => {
 
     res.render("listings/index.ejs", { allist: listings });
 });
-router
-.route("/:id")
-.get(wrapAsync (listingController.showlisting))
-.put(isloggedin,isOwner,upload.single('listing[image]'),validateListing,wrapAsync(listingController.updatelisting))
-.delete(isloggedin,isOwner,wrapAsync(listingController.deletelisting));
 
+router.route("/:id")
+    .get(wrapAsync(listingController.showlisting))
+    .put(isloggedin, isOwner, handleUpload, validateListing, wrapAsync(listingController.updatelisting))
+    .delete(isloggedin, isOwner, wrapAsync(listingController.deletelisting));
 
+router.get("/:id/edit", isloggedin, isOwner, wrapAsync(listingController.rendoreditform));
 
+// Delete additional image
+router.delete("/:id/images/:imageIndex", isloggedin, isOwner, wrapAsync(listingController.deleteAdditionalImage));
 
-
-
-// router.get("/",wrapAsync(listingController.index));
-
-//show
-//router.get("/:id",wrapAsync (listingController.showlisting));
-
-//router.post("/", isloggedin,validateListing, wrapAsync(listingController.createlisting));
-
-//update
-//get on click edit listing/:id/edit to render editejs to put listing/:id
-router.get("/:id/edit",isloggedin,isOwner,wrapAsync(listingController.rendoreditform));
-//router.put("/:id",isloggedin,isOwner,validateListing,wrapAsync(listingController.updatelisting));
-//delete
-//router.delete("/:id",isloggedin,isOwner,wrapAsync(listingController.deletelisting));
-
-module.exports =router;
-
-// router.post("/",validateListing,wrapAsync(async (req,res,next)=>{
-//        let result= listingSchema.validate(req.body);
-//    if(result.error){
-//     throw new ExpressError(500,result.error)
-//    }
-//         let {title,description,image,price,location,country}=req.body;
-//     await Listing.insertOne({
-//         title:title,
-//         description:description,
-//         image:image,
-//         price:price,
-//         location:location,
-//         country:country
-//     });
-//     res.redirect("/listings");
-
-// }));
+module.exports = router;

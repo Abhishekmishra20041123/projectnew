@@ -8,7 +8,10 @@
   // Loop over them and prevent submission
   Array.from(forms).forEach(form => {
     form.addEventListener('submit', event => {
-      if (!form.checkValidity()) {
+      // Skip validation if this is a file upload form (handled by file-upload.js)
+      const hasFileInputs = form.querySelectorAll('input[type="file"]').length > 0;
+      
+      if (!hasFileInputs && !form.checkValidity()) {
         event.preventDefault()
         event.stopPropagation()
       }

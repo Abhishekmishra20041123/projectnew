@@ -17,12 +17,18 @@ const multer = require("multer");
 app.set("views",path.join(__dirname,"views"));
 app.set("view engine","ejs");
 app.use(express.urlencoded({extended:true}));
+app.use(express.json()); // Add JSON parser for API requests
 app.engine("ejs",ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
 const Review = require("./models/review.js");
 const listingRouter = require("./routes/listing.js")
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const wishlistRouter = require("./routes/wishlist.js");
+const bookingRouter = require("./routes/booking.js");
+const paymentRouter = require("./routes/payment.js");
+const paypalRouter = require("./routes/paypal.js");
+const profileRouter = require("./routes/profile.js");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const flash = require("connect-flash");
@@ -32,16 +38,11 @@ const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 //database
 const Listing = require("./models/listing.js");
-const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
-const db_url = process.env.ATLASDB_URL
-async function main() {
-   await mongoose.connect(db_url);
-}
-main().then(()=>{
-    console.log("Database is connected!!!");
-}).catch((err)=>{
-    console.log(err);
-});
+const connectDB = require("./config/database.js");
+const listingController = require("./controllers/listing.js");
+
+// Connect to database
+connectDB();
 // app.get("/test",async (req,res)=>{
 //     let samplelisting = new Listing({
 //         title:"villa khandala",
@@ -54,14 +55,42 @@ main().then(()=>{
 //     console.log("sample saved");
 //     res.send("sucessful testing");
 // });
+// Debug route to check bookings
+app.get('/debug/bookings', async (req, res) => {
+    try {
+        const Booking = require('./models/booking.js');
+        const bookings = await Booking.find().sort({createdAt: -1}).limit(10);
+        
+        res.json({
+            totalBookings: bookings.length,
+            message: bookings.length === 0 ? 'No bookings found in database' : `Found ${bookings.length} bookings`,
+            bookings: bookings.map(booking => ({
+                id: booking._id,
+                listingId: booking.listing,
+                checkIn: booking.checkIn,
+                checkOut: booking.checkOut,
+                nights: booking.nights,
+                guests: booking.guests,
+                total: booking.total,
+                status: booking.status,
+                createdAt: booking.createdAt
+            }))
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+
 app.listen(8080,()=>{
     console.log("Server is listening");
 });
 
 const store = MongoStore.create({
-    mongoUrl:db_url,
+    mongoUrl: process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust",
     crypto:{
-        secret:process.env.SECRET
+        secret:process.env.SECRET || "mysecretcode"
     },
     touchAfter:24*3600
 })
@@ -70,13 +99,13 @@ store.on("error",()=>{
 });
 const sessionOption = {
     store,
-    secret:process.env.SECRET,
-    resave:false,
-    saveUninitialized:true,
-    cookie:{
-        expires:Date.now() + 7*24*60*60*100,
-        maxAge:7*24*60*60*100,
-        httpOnly:true,
+    secret: process.env.SECRET || "mysecretcode",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7*24*60*60*1000,
+        maxAge: 7*24*60*60*1000,
+        httpOnly: true,
     }
 }
 
@@ -95,42 +124,24 @@ app.use((req,res,next)=>{
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currUser = req.user;
+    res.locals.isAuthenticated = req.isAuthenticated();
     next();
 });
 
-// app.get("/demouser",async (req,res) =>{
-//     let fakeUser = new User({
-//         email:"student@gmail.com",
-//         username:"student"
-//     });
-
-//    let registerUser = await User.register(fakeUser,"password");
-//    res.send(registerUser);
-// });
-// const validateListing = (req,res,next)=>{
-//     let {error}= listingSchema.validate(req.body);
-//    if(error){
-//     let errMsg = error.details.map((el)=>el.message).join(",");
-//     throw new ExpressError(400,errMsg)
-//    }
-//    else
-//    next()
-// }
-// const validateReview = (req,res,next)=>{
-//     let {error}= reviewSchema.validate(req.body);
-//    if(error){
-//     let errMsg = error.details.map((el)=>el.message).join(",");
-//     throw new ExpressError(400,errMsg)
-//    }
-//    else
-//    next();
-// }
-
-
-app.use(methodOverride("_method"));
+app.use(methodOverride("_method", { methods: ['POST'] }));
 app.use("/listings",listingRouter)
 app.use("/listings/:id/reviews",reviewRouter)
 app.use("/",userRouter);
+app.use("/wishlist",wishlistRouter);
+app.use("/bookings",bookingRouter);
+app.use("/profile",profileRouter);
+app.use("/payments",paymentRouter);
+// Mount paypal router as a nested route under bookings
+app.use("/bookings",paypalRouter);
+
+// Test map route
+app.get("/testmap", listingController.testmap);
+
 // app.get("/",(req,res)=>{
 //     res.send("home route is on");
 // });
@@ -204,4 +215,5 @@ app.use((err,req,res,next)=>{
 
 
 //new route
+
 

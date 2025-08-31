@@ -1,0 +1,99 @@
+/* PWA Install Button Styles */
+#pwa-install-container {
+    display: none;
+    align-items: center;
+}
+
+/* Force show for testing - remove this in production */
+#pwa-install-container.show {
+    display: flex !important;
+}
+
+#pwa-install-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+#pwa-install-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+#pwa-install-btn:active {
+    transform: translateY(0);
+}
+
+#pwa-install-btn i {
+    margin-right: 6px;
+    font-size: 0.8rem;
+}
+
+/* PWA Installation Toast */
+.pwa-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #333;
+    color: white;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: none;
+    animation: slideIn 0.3s ease;
+}
+
+.pwa-toast.show {
+    display: block;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* PWA Status Indicator */
+.pwa-status {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.pwa-status.online {
+    background-color: #28a745;
+}
+
+.pwa-status.offline {
+    background-color: #dc3545;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #pwa-install-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .pwa-toast {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        text-align: center;
+    }
+}

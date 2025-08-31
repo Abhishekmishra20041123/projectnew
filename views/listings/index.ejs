@@ -125,7 +125,7 @@
   </a>
   <div class="tax-toggle">
     <div class="form-check-reverse form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+      <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" checked>
       <label class="form-check-label" for="switchCheckDefault">
         Display Total After Taxes
       </label>
@@ -160,14 +160,22 @@
 </ul> -->
 </body>
 <script>
+  // Set tax info visible by default since switch is checked
+  window.addEventListener('DOMContentLoaded', () => {
+    let taxinfo = document.getElementsByClassName("tax-info");
+    for(info of taxinfo){
+      info.style.display = "inline";
+    }
+  });
+
   let priceToggle = document.getElementById("switchCheckDefault");
-  priceToggle.addEventListener("click",()=>{
-    let taxinfo = document.getElementsByClassName("tax-info")
+  priceToggle.addEventListener("click", () => {
+    let taxinfo = document.getElementsByClassName("tax-info");
     for(info of taxinfo){
       if(info.style.display != "inline")
-      info.style.display ="inline"
+        info.style.display = "inline";
       else
-      info.style.display ="none"
+        info.style.display = "none";
     }
-  })
+  });
 </script>

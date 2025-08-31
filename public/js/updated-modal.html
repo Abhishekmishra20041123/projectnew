@@ -1,0 +1,132 @@
+<!-- Updated Guest Modal HTML with Direct Event Handlers -->
+<!-- Replace the existing modal in show.ejs with this version -->
+
+<div class="modal fade guest-modal" id="guestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-people me-2"></i>
+                    Guests
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="guest-control">
+                    <div class="guest-info">
+                        <h6>Adults</h6>
+                        <p>Age 13+</p>
+                    </div>
+                    <div class="counter-controls">
+                        <button type="button" class="counter-btn" id="adultsDecrease"
+                            onclick="window.bookingManager.changeGuestCount('adults', -1); return false;">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <span class="counter-value" id="adultsCount">1</span>
+                        <button type="button" class="counter-btn" id="adultsIncrease"
+                            onclick="window.bookingManager.changeGuestCount('adults', 1); return false;">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="guest-control">
+                    <div class="guest-info">
+                        <h6>Children</h6>
+                        <p>Ages 2-12</p>
+                    </div>
+                    <div class="counter-controls">
+                        <button type="button" class="counter-btn" id="childrenDecrease"
+                            onclick="window.bookingManager.changeGuestCount('children', -1); return false;">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <span class="counter-value" id="childrenCount">0</span>
+                        <button type="button" class="counter-btn" id="childrenIncrease"
+                            onclick="window.bookingManager.changeGuestCount('children', 1); return false;">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="guest-control">
+                    <div class="guest-info">
+                        <h6>Infants</h6>
+                        <p>Under 2</p>
+                    </div>
+                    <div class="counter-controls">
+                        <button type="button" class="counter-btn" id="infantsDecrease"
+                            onclick="window.bookingManager.changeGuestCount('infants', -1); return false;">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <span class="counter-value" id="infantsCount">0</span>
+                        <button type="button" class="counter-btn" id="infantsIncrease"
+                            onclick="window.bookingManager.changeGuestCount('infants', 1); return false;">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmGuests"
+                    onclick="window.bookingManager.confirmGuests(); return false;">
+                    <i class="bi bi-check-circle"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this script right after the modal HTML for immediate fixes -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Apply fix after the page is fully loaded
+        setTimeout(function () {
+            if (window.bookingManager) {
+                console.log('Applying guest counter fixes');
+
+                // Fix the updateGuestCounterButtons method
+                window.bookingManager.updateGuestCounterButtons = function () {
+                    const types = ['adults', 'children', 'infants'];
+                    const totalGuests = this.guestCounts.adults + this.guestCounts.children;
+
+                    console.log('Fixed updateGuestCounterButtons, current counts:', this.guestCounts);
+                    console.log('Total guests:', totalGuests, 'Max guests:', this.maxGuests);
+
+                    types.forEach(type => {
+                        const decreaseBtn = document.getElementById(`${type}Decrease`);
+                        const increaseBtn = document.getElementById(`${type}Increase`);
+
+                        if (!decreaseBtn || !increaseBtn) {
+                            console.log(`Button elements for ${type} not found`);
+                            return;
+                        }
+
+                        const count = this.guestCounts[type];
+
+                        // Determine decrease button state
+                        if (type === 'adults') {
+                            decreaseBtn.disabled = count <= 1;
+                        } else {
+                            decreaseBtn.disabled = count <= 0;
+                        }
+
+                        // Determine increase button state
+                        if (type === 'infants') {
+                            // Infants don't count towards maximum guests
+                            increaseBtn.disabled = count >= 5;
+                        } else if (type === 'adults' || type === 'children') {
+                            // Check if adding another guest would exceed maximum
+                            increaseBtn.disabled = (totalGuests >= this.maxGuests);
+                        }
+
+                        console.log(`${type} buttons - decrease: ${decreaseBtn.disabled}, increase: ${increaseBtn.disabled}`);
+                    });
+                };
+
+                // Update button states immediately
+                window.bookingManager.updateGuestCounterButtons();
+            }
+        }, 500);
+    });
+</script>

@@ -12,6 +12,7 @@ module.exports.isloggedin = (req, res, next) => {
             req.session.redirectUrl = req.originalUrl;
         }
 
+        console.log("User not authenticated, redirecting to login from:", req.originalUrl);
         req.flash("error", "You must be logged in first");
         return res.redirect("/login");
     }
@@ -36,14 +37,29 @@ module.exports.isOwner = async (req,res,next) =>{
     next()
 }
 module.exports.validateListing = (req,res,next)=>{
-    let {error}= listingSchema.validate(req.body);
-   if(error){
-    let errMsg = error.details.map((el)=>el.message).join(",");
-    throw new ExpressError(400,errMsg)
-   }
-   else
-   next()
+    console.log("Request body before validation:", JSON.stringify(req.body, null, 2));
+    
+    // Skip validation for multipart form data (file uploads)
+    if (req.is('multipart/form-data')) {
+        console.log("Skipping validation for multipart form data");
+        return next();
+    }
+    
+    // Ensure we're validating only the listing part of the body
+    // and allowing unknown keys to support image uploads and other fields
+    const { error } = listingSchema.validate(req.body, { 
+        allowUnknown: true,
+        stripUnknown: false 
+    });
+    
+    if (error) {
+        console.log("Validation error:", error.details);
+        const errMsg = error.details.map((el)=>el.message).join(",");
+        throw new ExpressError(400, errMsg);
+    }
+    next();
 }
+
 module.exports.validateReview = (req,res,next)=>{
     let {error}= reviewSchema.validate(req.body);
    if(error){

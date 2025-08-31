@@ -17,7 +17,11 @@ router
     passport.authenticate("local",{failureRedirect:"/login",failureFlash:true})
     ,usercontroller.login);
 
-router.get("/logout",usercontroller.logout)
+// Clear routes for logout
+router.post("/logout", wrapAsync(usercontroller.logout));
+router.get("/logout", wrapAsync(usercontroller.logout));
+
+
 
 module.exports = router;
 

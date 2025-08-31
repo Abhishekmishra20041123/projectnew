@@ -8,7 +8,29 @@ module.exports.listingSchema = Joi.object({
     location: Joi.string().required(),
     country: Joi.string().required(),
     price: Joi.number().required().min(0),
-    image: Joi.string().allow('', null),
+    accommodates: Joi.number().min(1).required(),
+    propertyType: Joi.string().valid('Entire place','Private room','Shared room','Hotel room').required(),
+    bedrooms: Joi.number().min(0).required(),
+    bathrooms: Joi.number().min(0.5).required(),
+    beds: Joi.number().min(1).required(),
+    amenities: Joi.alternatives().try(Joi.array().items(Joi.string()), Joi.string()).optional(),
+    houseRules: Joi.object({
+      checkIn: Joi.string().optional(),
+      checkOut: Joi.string().optional(),
+      minStay: Joi.number().min(1).optional(),
+      maxStay: Joi.number().min(1).optional(),
+      maxGuests: Joi.number().min(1).optional(),
+      smokingAllowed: Joi.boolean().optional(),
+      petsAllowed: Joi.boolean().optional(),
+      eventsAllowed: Joi.boolean().optional()
+    }).optional(),
+    availability: Joi.object({
+      instantBook: Joi.boolean().optional(),
+      minAdvanceNotice: Joi.string().valid('Same day','1 day','2 days','3 days','1 week').optional(),
+      maxAdvanceNotice: Joi.string().valid('3 months','6 months','9 months','12 months','All dates available').optional()
+    }).optional(),
+    image: Joi.any(),
+    additionalImages: Joi.any(),
     category: Joi.string().valid(
       'Trending',
       'Rooms',
@@ -22,8 +44,8 @@ module.exports.listingSchema = Joi.object({
       'Vacant',
       'Hotel'
     ).required()
-  }).required()
-});
+  }).required().unknown(true)
+}).unknown(true);
 
 
 module.exports.reviewSchema = Joi.object({
@@ -32,4 +54,3 @@ module.exports.reviewSchema = Joi.object({
         comment:Joi.string().required()
     }).required(),
 })
-

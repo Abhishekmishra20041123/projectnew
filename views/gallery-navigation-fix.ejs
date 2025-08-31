@@ -1,0 +1,138 @@
+<!-- Gallery Navigation Fix -->
+<script>
+    /**
+     * Enhanced Gallery Navigation
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Gallery navigation enhancement loaded');
+        
+        // 1. Fix navigation button visibility
+        enhanceNavigationButtons();
+        
+        // 2. Fix the image modal to start at the clicked image
+        fixImageModalStartIndex();
+        
+        // 3. Add keyboard navigation
+        addKeyboardNavigation();
+    });
+    
+    function enhanceNavigationButtons() {
+        // Add custom styles for navigation buttons
+        const navStyles = document.createElement('style');
+        navStyles.textContent = `
+            /* Navigation buttons with larger clickable area and improved visibility */
+            .position-absolute.top-50.start-0.translate-middle-y,
+            .position-absolute.top-50.end-0.translate-middle-y {
+                width: 100px !important;
+                height: 100px !important;
+                cursor: pointer;
+                z-index: 1050;
+            }
+            
+            .position-absolute.top-50.start-0.translate-middle-y > div,
+            .position-absolute.top-50.end-0.translate-middle-y > div {
+                width: 60px !important;
+                height: 60px !important;
+                background-color: rgba(0, 0, 0, 0.75) !important;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+            }
+            
+            .position-absolute.top-50.start-0.translate-middle-y > div:hover,
+            .position-absolute.top-50.end-0.translate-middle-y > div:hover {
+                transform: scale(1.1);
+                background-color: rgba(0, 0, 0, 0.9) !important;
+            }
+            
+            .position-absolute.top-50.start-0.translate-middle-y > div > i,
+            .position-absolute.top-50.end-0.translate-middle-y > div > i {
+                font-size: 2rem !important;
+                color: white;
+                filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.7));
+            }
+            
+            /* Mobile responsiveness */
+            @media (max-width: 768px) {
+                .position-absolute.top-50.start-0.translate-middle-y,
+                .position-absolute.top-50.end-0.translate-middle-y {
+                    width: 70px !important;
+                    height: 70px !important;
+                }
+                
+                .position-absolute.top-50.start-0.translate-middle-y > div,
+                .position-absolute.top-50.end-0.translate-middle-y > div {
+                    width: 50px !important;
+                    height: 50px !important;
+                }
+            }
+        `;
+        document.head.appendChild(navStyles);
+    }
+    
+    function fixImageModalStartIndex() {
+        // Override the openImageModal function to ensure it starts at the clicked image
+        const originalOpenImageModal = window.openImageModal;
+        
+        window.openImageModal = function(index, type) {
+            console.log('Enhanced openImageModal called:', index, type);
+            
+            if (!window.galleryImages || window.galleryImages.length === 0) {
+                window.prepareGalleryImages();
+            }
+            
+            // Set the correct current image index based on the clicked image
+            if (type === 'main') {
+                window.currentImageIndex = 0;
+            } else if (type === 'additional') {
+                // For additional images, we need to add 1 to the index if there's a main image
+                <% if (listdata.image && listdata.image.url) { %>
+                window.currentImageIndex = index + 1; // Add 1 to account for main image
+                <% } else { %>
+                window.currentImageIndex = index; // No main image, so use index directly
+                <% } %>
+            } else {
+                window.currentImageIndex = index;
+            }
+            
+            console.log('Setting current image index to:', window.currentImageIndex);
+            
+            // Make sure the index is valid
+            if (window.currentImageIndex >= window.galleryImages.length) {
+                window.currentImageIndex = 0;
+            }
+            
+            // Show the modal
+            const imageModal = document.getElementById('imageModal');
+            if (imageModal) {
+                try {
+                    const modal = new bootstrap.Modal(imageModal);
+                    modal.show();
+                    
+                    // Update the image after modal is shown
+                    setTimeout(() => {
+                        window.updateModalImage();
+                    }, 100);
+                } catch (error) {
+                    console.error('Error showing modal:', error);
+                }
+            }
+        };
+    }
+    
+    function addKeyboardNavigation() {
+        // Add keyboard navigation for the modal
+        document.addEventListener('keydown', function(event) {
+            const imageModal = document.getElementById('imageModal');
+            if (imageModal && imageModal.classList.contains('show')) {
+                if (event.key === 'ArrowLeft') {
+                    window.previousImage();
+                } else if (event.key === 'ArrowRight') {
+                    window.nextImage();
+                }
+            }
+        });
+    }
+</script>

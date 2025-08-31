@@ -1,82 +1,193 @@
 <style>
   /* Search bar container for alignment */
-.search-container {
-  display: flex;
-  align-items: center;
-}
+  .search-container {
+    display: flex;
+    align-items: center;
+  }
 
-/* Search input */
-.search-container .form-control {
-  border-radius: 25px 0 0 25px;
-  padding: 0.6rem 1rem;
-  border: 1px solid #ccc;
-  border-right: none;
-  font-size: 0.95rem;
-  outline: none;
-}
+  /* Search input */
+  .search-container .form-control {
+    border-radius: 25px 0 0 25px;
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-right: none;
+    font-size: 0.95rem;
+    outline: none;
+  }
 
-/* Search button */
-.btn-search {
-  background-color: #fe424d;
-  color: white;
-  border-radius: 0 25px 25px 0;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
-}
+  /* Search button */
+  .btn-search {
+    background-color: #fe424d;
+    color: white;
+    border-radius: 0 25px 25px 0;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+  }
 
-.btn-search:hover {
-  background-color: #e63946;
-  color: white;
-  transform: scale(1.05);
-}
+  .btn-search:hover {
+    background-color: #e63946;
+    color: white;
+    transform: scale(1.05);
+  }
 
-/* Icon inside button */
-.btn-search i {
-  font-size: 1rem;
-}
+  /* Icon inside button */
+  .btn-search i {
+    font-size: 1rem;
+  }
 
+  /* Navbar brand alignment */
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    /* Increased margin to better align with other elements */
+  }
+
+  .navbar-brand i {
+    margin-right: 5px;
+    /* Add some space between icon and text */
+  }
 </style>
 <nav class="navbar navbar-expand-md bg-body-tertiary border-bottom sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa-solid fa-compass"></i>Airbnb</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" >
-    <span class="navbar-toggler-icon"></span>
+    <a class="navbar-brand" href="/listings"><i class="bi bi-backpack" style="color: #ff385c; font-size: 2.2rem;"></i>
+      HomyStay</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+      <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-link" href="/listings">Explore</a>
       </div>
       <div class="navbar nav ms-auto">
-   <form class="search-container" action="/listings/search" method="GET">
-  <input 
-    class="form-control" 
-    type="search" 
-    name="q" 
-    placeholder="Search by country, location, or hotel name" 
-    aria-label="Search"
-  />
-  <button class="btn-search" type="submit">
-    <i class="fa-solid fa-magnifying-glass"></i> Search
-  </button>
-</form>
+        <form class="search-container" action="/listings/search" method="GET">
+          <input class="form-control" type="search" name="q" placeholder="Search by country, location, or hotel name"
+            aria-label="Search" />
+          <button class="btn-search" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+          </button>
+        </form>
 
 
-  </div>
+      </div>
       <div class="navbar-nav ms-auto">
-      <a class="nav-link" href="/listings/new">Add new List</a>
-        <% if(!currUser){ %>
-        <a class="nav-link"  href="/signup"><b>SignUp</b></a>
-        <a class="nav-link" href="/login"><b>Login</b></a>
-        <% } %>
         <% if(currUser){ %>
-        <a class="nav-link" href="/logout"><b>Logout</b></a>
-        <% } %>
+
+
+          <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" onclick="toggleDropdown(event)" id="userDropdown">
+              <% if(currUser.profile && currUser.profile.profilePicture) { %>
+                <img src="<%= currUser.profile.profilePicture.url %>" class="rounded-circle" width="30" height="30"
+                  alt="Profile">
+                <% } else { %>
+                  <i class="bi bi-person-circle"></i>
+                  <% } %>
+                    <%= currUser.username %>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <h6 class="dropdown-header">Dashboard</h6>
+              </li>
+              <li><a class="dropdown-item" href="/profile/dashboard/guest?type=guest">
+                  <i class="bi bi-person"></i> Guest Dashboard
+                </a></li>
+              <li><a class="dropdown-item" href="/profile/dashboard/host?type=host">
+                  <i class="bi bi-house"></i> Host Dashboard
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li>
+                <h6 class="dropdown-header">Account</h6>
+              </li>
+              <li><a class="dropdown-item" href="/profile/<%= currUser._id %>">
+                  <i class="bi bi-person"></i> View Profile
+                </a></li>
+              <li><a class="dropdown-item" href="/profile/<%= currUser._id %>/edit">
+                  <i class="bi bi-pencil"></i> Edit Profile
+                </a></li>
+              <li><a class="dropdown-item" href="/bookings/my-bookings">
+                  <i class="bi bi-calendar3"></i> My Bookings
+                </a></li>
+              <li><a class="dropdown-item" href="/bookings/host-bookings">
+                  <i class="bi bi-calendar-check"></i> Host Bookings
+                </a></li>
+              <li><a class="dropdown-item" href="/wishlist">
+                  <i class="bi bi-heart"></i> Wishlist
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="/listings/new">
+                  <i class="bi bi-plus"></i> Add new Listing
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li>
+                <form action="/logout" method="POST" id="logout-form" style="display: inline;">
+                  <button type="submit" class="dropdown-item" onclick="console.log('Logout button clicked')"
+                    style="cursor: pointer;">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </div>
+          <% } else { %>
+            <a class="nav-link" href="/signup"><b>SignUp</b></a>
+            <a class="nav-link" href="/login"><b>Login</b></a>
+            <% } %>
       </div>
     </div>
   </div>
 </nav>
+
+<!-- Direct JavaScript for navbar dropdown -->
+<script>
+  // Function to toggle dropdown menu
+  function toggleDropdown(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Find the dropdown menu
+    var dropdown = event.currentTarget.nextElementSibling;
+
+    // Toggle the 'show' class to display/hide the dropdown
+    if (dropdown.classList.contains('show')) {
+      dropdown.classList.remove('show');
+    } else {
+      // Close any other open dropdowns first
+      document.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
+        menu.classList.remove('show');
+      });
+
+      dropdown.classList.add('show');
+    }
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (event) {
+    if (!event.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
+        menu.classList.remove('show');
+      });
+    }
+  });
+
+  // Ensure logout form works properly
+  document.addEventListener('DOMContentLoaded', function () {
+    const logoutForm = document.getElementById('logout-form');
+    if (logoutForm) {
+      // Add submit event listener
+      logoutForm.addEventListener('submit', function (e) {
+        // Let the form submit naturally
+      });
+    }
+  });
+</script>
