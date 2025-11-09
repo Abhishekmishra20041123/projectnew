@@ -1,0 +1,566 @@
+<% layout("layouts/boilerplate") %>
+
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-picture-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-picture {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-picture:hover {
+            transform: scale(1.05);
+        }
+
+        .edit-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 50%;
+            padding: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .badge-host {
+            background: linear-gradient(45deg, #ff6b6b, #ffa502);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-superhost {
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #333;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-card {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: none;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .verification-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .verification-item:last-child {
+            border-bottom: none;
+        }
+
+        .listing-card-profile {
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .listing-card-profile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .listing-img {
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .rating-stars i {
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Design for Profile Page */
+        @media (max-width: 768px) {
+            .profile-header {
+                padding: 1.5rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .profile-picture {
+                width: 100px;
+                height: 100px;
+            }
+
+            .empty-state {
+                padding: 2rem 1rem;
+            }
+
+            .section-card {
+                margin-bottom: 1rem;
+                padding: 1rem;
+            }
+
+            .card-body {
+                padding: 1rem !important;
+            }
+
+            .col-md-4,
+            .col-md-8 {
+                width: 100% !important;
+                margin-bottom: 1.5rem;
+            }
+
+            .verification-item {
+                padding: 0.75rem 0;
+                font-size: 0.9rem;
+            }
+
+            .verification-item .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 0.5rem;
+            }
+
+            .verification-item small {
+                width: 100%;
+                text-align: left !important;
+                max-width: 100% !important;
+            }
+
+            .stats-card {
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .row {
+                margin-left: -0.5rem;
+                margin-right: -0.5rem;
+            }
+
+            .row > * {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .listing-card-profile {
+                margin-bottom: 1rem;
+            }
+
+            .col-md-6 {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .profile-header {
+                padding: 1rem 0.75rem;
+            }
+
+            .profile-picture {
+                width: 80px;
+                height: 80px;
+            }
+
+            .section-card {
+                padding: 0.75rem;
+            }
+
+            .verification-item {
+                padding: 0.5rem 0;
+                font-size: 0.85rem;
+            }
+
+            .verification-item .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 0.25rem;
+            }
+
+            .verification-item small {
+                width: 100%;
+                text-align: left !important;
+                max-width: 100% !important;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+
+    <div class="container mt-4">
+        <div class="profile-header">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <div class="profile-picture-container">
+                        <% if(profileUser.profile && profileUser.profile.profilePicture) { %>
+                            <img src="<%= profileUser.profile.profilePicture.url %>"
+                                class="rounded-circle profile-picture" width="150" height="150"
+                                style="object-fit: cover;" alt="Profile Picture">
+                            <% } else { %>
+                                <div class="bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center profile-picture"
+                                    style="width: 150px; height: 150px;">
+                                    <i class="bi bi-person display-3 text-secondary"></i>
+                                </div>
+                                <% } %>
+                                    <% if(isOwnProfile) { %>
+                                        <a href="/profile/<%= profileUser._id %>/edit" class="edit-btn">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <% } %>
+                    </div>
+                </div>
+                <div class="col-md-9 text-center text-md-start">
+                    <h2 class="mb-2">
+                        <% if(profileUser.profile && profileUser.profile.firstName && profileUser.profile.lastName) { %>
+                            <%= profileUser.profile.firstName %>
+                                <%= profileUser.profile.lastName %>
+                                    <% } else { %>
+                                        <%= profileUser.username %>
+                                            <% } %>
+                    </h2>
+                    <p class="mb-3">@<%= profileUser.username %>
+                    </p>
+
+                    <% if(profileUser.host && profileUser.host.isHost) { %>
+                        <div class="mb-3">
+                            <span class="badge-host">
+                                <i class="bi bi-house"></i> Host
+                            </span>
+                            <% if(profileUser.host.superhost) { %>
+                                <span class="badge-superhost ms-2">
+                                    <i class="bi bi-star-fill"></i> Superhost
+                                </span>
+                                <% } %>
+                        </div>
+
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stats-card">
+                                    <h4 class="mb-0">
+                                        <%= profileUser.host.totalReviews || 0 %>
+                                    </h4>
+                                    <small>Reviews</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stats-card">
+                                    <h4 class="mb-0">
+                                        <%= profileUser.host.hostRating || 0 %>
+                                    </h4>
+                                    <small>Rating</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stats-card">
+                                    <h4 class="mb-0">
+                                        <% if(profileUser.host && profileUser.host.isHost && profileUser.host.hostSince) { %>
+                                            <%= new Date().getFullYear() - new Date(profileUser.host.hostSince).getFullYear() %>
+                                                <% } else { %>
+                                                    0
+                                                    <% } %>
+                                    </h4>
+                                    <small>Years hosting</small>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card section-card">
+                    <div class="card-body">
+                        <h5 class="section-title">
+                            <i class="bi bi-info-circle"></i> About
+                        </h5>
+                        <% if(profileUser.profile && profileUser.profile.bio) { %>
+                            <p>
+                                <%= profileUser.profile.bio %>
+                            </p>
+                            <% } else { %>
+                                <p class="text-muted">No bio available.</p>
+                                <% } %>
+
+                                    <% if(profileUser.host && profileUser.host.isHost && profileUser.host.hostSince) {
+                                        %>
+                                        <p class="mb-1">
+                                            <i class="bi bi-calendar3"></i>
+                                            <strong>Joined:</strong>
+                                            <%= new Date(profileUser.host.hostSince).toLocaleDateString() %>
+                                        </p>
+                                        <% } %>
+
+                                            <% if(profileUser.profile && profileUser.profile.languages &&
+                                                profileUser.profile.languages.length> 0) { %>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-translate"></i>
+                                                    <strong>Languages:</strong>
+                                                    <%= profileUser.profile.languages.join(', ') %>
+                        </p>
+                    <% } %>
+                    
+                    <% if(profileUser.host && profileUser.host.isHost) { %>
+                        <p class="mb-1">
+                            <i class="bi bi-clock"></i> 
+                            <strong>Response time:</strong> <%= profileUser.host.responseTime %>
+                        </p>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="card section-card">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <i class="bi bi-shield-check"></i> Verification
+                    </h5>
+                    <div class="verification-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="<%= profileUser.profile && profileUser.profile.verified && profileUser.profile.verified.email ? 'text-success' : 'text-muted' %>">
+                                <i class="bi bi-<%= profileUser.profile && profileUser.profile.verified && profileUser.profile.verified.email ? 'check-circle-fill' : 'circle' %> me-2"></i>
+                                Email address
+                            </span>
+                            <small class="text-muted">
+                                <%= profileUser.email || 'Not provided' %>
+                            </small>
+                        </div>
+                    </div>
+                    <div class="verification-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span
+                                class="<%= profileUser.profile && profileUser.profile.verified && profileUser.profile.verified.phone ? 'text-success' : 'text-muted' %>">
+                                <i
+                                    class="bi bi-<%= profileUser.profile && profileUser.profile.verified && profileUser.profile.verified.phone ? 'check-circle-fill' : 'circle' %> me-2"></i>
+                                Phone number
+                            </span>
+                            <small class="text-muted">
+                                <%= profileUser.profile && profileUser.profile.phone ? profileUser.profile.phone : 'Not provided' %>
+                            </small>
+                        </div>
+                    </div>
+                    <div class="verification-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span
+                                class="<%= profileUser.profile && profileUser.profile.verified && profileUser.profile.verified.identity ? 'text-success' : 'text-muted' %>">
+                                <i
+                                    class="bi bi-<%= profileUser.profile && profileUser.profile.verified && profileUser.profile.verified.identity ? 'check-circle-fill' : 'circle' %> me-2"></i>
+                                Identity
+                            </span>
+                            <div class="d-flex flex-column align-items-end">
+                                <small class="text-muted">
+                                    <%= profileUser.profile && profileUser.profile.verified && profileUser.profile.verified.identity ? 'Verified' : (profileUser.profile && profileUser.profile.identityDocument && profileUser.profile.identityDocument.url ? 'Under Review' : 'Not verified') %>
+                                </small>
+                                <% if(isOwnProfile && profileUser.profile && profileUser.profile.identityDocument && profileUser.profile.identityDocument.url && !(profileUser.profile.verified && profileUser.profile.verified.identity)) { %>
+                                    <small class="text-info">
+                                        <i class="bi bi-clock"></i> Document submitted
+                                    </small>
+                                <% } else if(isOwnProfile && (!profileUser.profile || !profileUser.profile.identityDocument || !profileUser.profile.identityDocument.url)) { %>
+                                    <small class="text-warning">
+                                        <a href="/profile/<%= profileUser._id %>/edit" class="text-decoration-none">
+                                            <i class="bi bi-upload"></i> Upload document
+                                        </a>
+                                    </small>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% if(profileUser.profile && profileUser.profile.identityDocument && profileUser.profile.identityDocument.url && (isOwnProfile || (currUser && currUser.isAdmin))) { %>
+                            <div class="mt-2">
+                                <a href="/profile/<%= profileUser._id %>/document" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View Document
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
+                    <% if(profileUser.profile && profileUser.profile.firstName) { %>
+                    <div class="verification-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">
+                                <i class="bi bi-person me-2"></i>
+                                Full Name
+                            </span>
+                            <small class="text-muted">
+                                <%= profileUser.profile.firstName %> <%= profileUser.profile.lastName || '' %>
+                            </small>
+                        </div>
+                    </div>
+                    <% } %>
+                    <% if(profileUser.profile && profileUser.profile.address) { %>
+                    <div class="verification-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">
+                                <i class="bi bi-geo-alt me-2"></i>
+                                Address
+                            </span>
+                            <small class="text-muted text-end" style="max-width: 60%;">
+                                <%= profileUser.profile.address.street || '' %> <%= profileUser.profile.address.city || '' %> <%= profileUser.profile.address.state || '' %> <%= profileUser.profile.address.zipCode || '' %>
+                            </small>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <% if(profileUser.host && profileUser.host.isHost && listings.length> 0) { %>
+                <div class="card section-card">
+                    <div class="card-body">
+                        <h5 class="section-title">
+                            <i class="bi bi-house"></i>
+                            <%= profileUser.profile && profileUser.profile.firstName ? profileUser.profile.firstName + "'s" : profileUser.username + "'s" %> Listings
+                        </h5>
+
+                        <div class="row">
+                            <% listings.forEach(listing=> { %>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card listing-card-profile">
+                                        <img src="<%= listing.image.url %>" class="card-img-top listing-img"
+                                            alt="<%= listing.title %>">
+                                        <div class="card-body">
+                                            <h6 class="card-title">
+                                                <%= listing.title %>
+                                            </h6>
+                                            <p class="card-text mb-2">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-geo-alt"></i>
+                                                    <%= listing.location %>
+                                                </small>
+                                            </p>
+                                            <p class="card-text mb-3">
+                                                <strong>₹<%= listing.price %></strong> per night
+                                            </p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="rating-stars">
+                                                    <% for(let i=1; i <=5; i++) { %>
+                                                        <i class="bi bi-star<%= i <= (listing.rating.overall || 0) ? '-fill' : '' %> text-warning"></i>
+                                                        <% } %>
+                                                            <small class="text-muted ms-1">(<%= listing.reviews.length %>)</small>
+                                                </div>
+                                                <a href="/listings/<%= listing._id %>"
+                                                    class="btn btn-outline-primary btn-sm">
+                                                    View
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+
+                        <% if(listings.length===6) { %>
+                            <div class="text-center mt-3">
+                                <a href="/listings?host=<%= profileUser._id %>" class="btn btn-outline-primary">
+                                    View All Listings
+                                </a>
+                            </div>
+                            <% } %>
+                    </div>
+                </div>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i class="bi bi-house"></i>
+                        <h4 class="mt-3">
+                            <% if(profileUser.host && profileUser.host.isHost) { %>
+                                No listings yet
+                                <% } else { %>
+                                    Not a host yet
+                                    <% } %>
+                        </h4>
+                        <p class="text-muted">
+                            <% if(isOwnProfile) { %>
+                                <% if(!profileUser.host || !profileUser.host.isHost) { %>
+                                    Become a host and start earning money by listing your space.
+                                    <% } else { %>
+                                        Create your first listing to start hosting guests.
+                                        <% } %>
+                                            <% } else { %>
+                                                This user hasn't listed any properties yet.
+                                                <% } %>
+                        </p>
+                        <% if(isOwnProfile && (!profileUser.host || !profileUser.host.isHost)) { %>
+                            <a href="/profile/<%= profileUser._id %>/edit" class="btn btn-primary">
+                                Become a Host
+                            </a>
+                            <% } else if(isOwnProfile) { %>
+                                <a href="/listings/new" class="btn btn-primary">
+                                    Create Listing
+                                </a>
+                                <% } %>
+                    </div>
+                    <% } %>
+
+                        <div class="card section-card">
+                            <div class="card-body">
+                                <h5 class="section-title">
+                                    <i class="bi bi-chat-quote"></i> Reviews
+                                </h5>
+                                <% if(reviewsCount> 0) { %>
+                                    <p>
+                                        <strong>
+                                            <%= reviewsCount %>
+                                        </strong>
+                                        review<%= reviewsCount !==1 ? 's' : '' %>
+                                    </p>
+                                    <!-- Reviews would be displayed here -->
+                                    <p class="text-muted">Review details would be shown here...</p>
+                                    <% } else { %>
+                                        <p class="text-muted">No reviews yet.</p>
+                                        <% } %>
+                            </div>
+                        </div>
+        </div>
+    </div>
+    </div>

@@ -1,0 +1,3006 @@
+<% layout("/layouts/boilerplate") %>
+
+    <style>
+        :root {
+            --primary-color: #ff385c;
+            --primary-hover: #e31c5f;
+            --secondary-color: #00848a;
+            --text-primary: #222222;
+            --text-secondary: #717171;
+            --border-color: #dddddd;
+            --bg-light: #f7f7f7;
+            --shadow-light: 0 2px 16px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 6px 20px rgba(0, 0, 0, 0.12);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .enhanced-booking-card {
+            position: sticky;
+            top: 100px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: var(--transition);
+            z-index: 10;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        
+        /* Ensure proper spacing between columns */
+        @media (min-width: 768px) {
+            .col-md-8 {
+                padding-right: 2rem !important;
+            }
+            .col-md-4 {
+                padding-left: 1rem !important;
+            }
+        }
+
+        /* Mobile responsive - reorder booking and reviews */
+        @media (max-width: 767px) {
+            /* Make row a flex container */
+            .row.mt-4 {
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Booking card column - comes first on mobile */
+            .col-md-4 {
+                order: 1 !important;
+                margin-bottom: 2rem;
+                padding: 0.75rem;
+                width: 100% !important;
+            }
+
+            /* Left column - comes after booking on mobile */
+            .col-md-8 {
+                order: 2 !important;
+                padding: 0.75rem;
+                width: 100% !important;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* All content in left column except reviews */
+            .col-md-8 > *:not(.mobile-reviews-last) {
+                order: 0;
+            }
+
+            /* Reviews section comes last on mobile */
+            .col-md-8 > .mobile-reviews-last {
+                order: 3 !important;
+            }
+
+            /* Make booking card not sticky on mobile */
+            .enhanced-booking-card {
+                position: relative !important;
+                top: 0 !important;
+                max-height: none !important;
+                margin: 0.5rem 0;
+            }
+
+            /* Add spacing to all sections */
+            .col-md-8 > * {
+                margin-bottom: 1.5rem;
+            }
+
+            .col-md-8 > *:last-child {
+                margin-bottom: 0;
+            }
+
+            /* Ensure proper spacing for reviews section */
+            .reviews-section {
+                padding: 1rem 0.75rem;
+                margin: 1rem 0;
+            }
+
+            /* Container spacing */
+            .container {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+
+            /* Image gallery spacing */
+            .img-fluid {
+                margin: 0.5rem 0;
+                padding: 0.25rem;
+            }
+        }
+
+        .enhanced-booking-card:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .booking-card-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .price-display {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .price-amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .price-per {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .rating-summary {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .rating-star {
+            color: #ffc107;
+            font-size: 16px;
+        }
+
+        .booking-form-container {
+            padding: 24px;
+        }
+
+        .date-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 16px;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .date-inputs:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+
+        .date-inputs.focused {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.2);
+        }
+
+        .date-input-group {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .date-input-group:first-child {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .date-input-group:hover {
+            background-color: rgba(255, 56, 92, 0.05);
+        }
+
+        .date-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .date-value {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .date-value.placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .guests-selector {
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .guests-selector:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+
+        .guests-selector.focused {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.2);
+        }
+
+        .guests-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .guests-value {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-arrow {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .guests-selector.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .enhanced-reserve-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            border: none;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 16px 24px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .enhanced-reserve-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .enhanced-reserve-btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .enhanced-reserve-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: var(--transition);
+        }
+
+        .enhanced-reserve-btn:hover::before {
+            left: 100%;
+        }
+
+        .booking-note {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .price-breakdown {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            transition: var(--transition);
+            border-radius: 6px;
+        }
+
+        .price-row:hover {
+            background-color: rgba(255, 56, 92, 0.05);
+            padding: 8px 12px;
+            margin: 4px -12px 12px;
+        }
+
+        .price-total {
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+            margin-top: 16px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Enhanced Calendar Styles */
+        .calendar-modal .modal-dialog {
+            max-width: 800px;
+        }
+
+        .calendar-modal .modal-content {
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .calendar-header-enhanced {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            color: white;
+            padding: 24px;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .calendar-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            padding: 32px;
+        }
+
+        .calendar-month {
+            text-align: center;
+        }
+
+        .month-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 12px 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            font-weight: 500;
+            transition: var(--transition);
+            font-size: 14px;
+            position: relative;
+        }
+
+        .calendar-day:hover:not(.disabled):not(.empty) {
+            background-color: rgba(255, 56, 92, 0.1);
+            transform: scale(1.1);
+        }
+
+        .calendar-day.selected {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.15);
+        }
+
+        .calendar-day.in-range {
+            background-color: rgba(255, 56, 92, 0.15);
+            border-radius: 0;
+        }
+
+        .calendar-day.range-start {
+            border-radius: 50% 0 0 50%;
+        }
+
+        .calendar-day.range-end {
+            border-radius: 0 50% 50% 0;
+        }
+
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .calendar-day.disabled::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            width: 1px;
+            height: 70%;
+            background: #ccc;
+        }
+
+        .calendar-day.empty {
+            cursor: default;
+        }
+
+        .calendar-day.today {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .calendar-day.today:not(.selected) {
+            background-color: rgba(255, 56, 92, 0.1);
+        }
+
+        /* Guest Selector Modal */
+        .guest-modal .modal-content {
+            border: none;
+            border-radius: var(--radius);
+        }
+
+        .guest-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .guest-control:last-child {
+            border-bottom: none;
+        }
+
+        .guest-info h6 {
+            margin: 0 0 4px 0;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .guest-info p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .counter-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .counter-btn:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .counter-btn:disabled {
+            background-color: var(--bg-light);
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .counter-value {
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 24px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .calendar-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding: 20px;
+            }
+
+            .enhanced-booking-card {
+                position: relative;
+                top: 0;
+                margin-top: 20px;
+            }
+
+            .date-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .date-input-group:first-child {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Success Animation */
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .price-breakdown.visible {
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        /* Tooltip */
+        .tooltip-trigger {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip-trigger:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 4px;
+        }
+
+        .tooltip-trigger:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: var(--text-primary);
+            z-index: 1000;
+        }
+    </style>
+
+    <script>
+        // Define variables for the map
+        const mapToken = '<%= typeof mapToken !== "undefined" ? mapToken : "" %>';
+        const listing = <%- JSON.stringify(listdata) %>;
+        
+        // Debug logging
+        console.log('=== DEBUG: show.ejs template ===');
+        console.log('mapToken typeof:', typeof mapToken);
+        console.log('mapToken value:', mapToken);
+        console.log('listing typeof:', typeof listing);
+        console.log('listing value:', listing);
+    </script>
+    
+    <!-- Include map.js to initialize the map -->
+    <script src="/js/map.js"></script>
+
+    <div class="container mt-4">
+        <!-- Header with title and actions -->
+        <div class="row">
+            <div class="col-md-8">
+                <h2>
+                    <%= listdata.title %>
+                </h2>
+                <p class="text-muted">
+                    <i class="bi bi-geo-alt"></i>
+                    <%= listdata.location %>, <%= listdata.country %>
+                            <span class="ms-3">
+                                <% for(let i=1; i <=5; i++) { %>
+                                    <i
+                                        class="bi bi-star<%= i <= (listdata.rating.overall || 0) ? '-fill' : '' %> text-warning"></i>
+                                    <% } %>
+                                        <strong>
+                                            <%= listdata.rating.overall || 5.0 %>
+                                        </strong>
+                                        (<%= listdata.reviews.length %> reviews)
+                            </span>
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <% if(currUser && !currUser._id.equals(listdata.owner._id)) { %>
+                    <button class="btn btn-outline-danger me-2" id="wishlist-btn" data-listing-id="<%= listdata._id %>">
+                        <i class="bi bi-heart" id="wishlist-icon"></i> Save
+                    </button>
+                    <% } %>
+                        <button class="btn btn-outline-primary"
+                            onclick="navigator.share ? navigator.share({title: '<%= listdata.title %>', url: window.location.href}) : copyToClipboard(window.location.href)">
+                            <i class="bi bi-share"></i> Share
+                        </button>
+            </div>
+        </div>
+
+        <!-- Image Gallery -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-md-6">
+                        <% if(listdata.image && listdata.image.url) { %>
+                            <img src="<%= listdata.image.url %>" class="img-fluid rounded-start w-100"
+                                style="height: 400px; object-fit: cover; cursor: pointer;" alt="<%= listdata.title %>"
+                                onclick="openImageModal(0, 'main')">
+                            <% } else { %>
+                                <div class="bg-light rounded-start w-100 d-flex align-items-center justify-content-center"
+                                    style="height: 400px;">
+                                    <div class="text-center text-muted">
+                                        <i class="bi bi-image display-1"></i>
+                                        <p class="mt-2">No main image available</p>
+                                    </div>
+                                </div>
+                                <% } %>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <% if(listdata.additionalImages && listdata.additionalImages.length> 0) { %>
+                                <% listdata.additionalImages.slice(0, 4).forEach((img, index)=> { %>
+                                    <div class="col-6">
+                                        <img src="<%= img.url %>" class="img-fluid rounded mb-2 w-100"
+                                            style="height: 195px; object-fit: cover; cursor: pointer;"
+                                            alt="Additional image <%= index + 1 %>"
+                                            onclick="openImageModal(<%= index %>, 'additional')">
+                                    </div>
+                                    <% }) %>
+                                        <!-- Show "View all" button if there are more than 4 additional images -->
+                                        <% if(listdata.additionalImages.length> 4) { %>
+                                            <div class="position-relative">
+                                                <button class="btn btn-outline-light position-absolute"
+                                                    style="bottom: 15px; right: 15px; z-index: 10;"
+                                                    onclick="openAllImagesModal()">
+                                                    <i class="bi bi-grid-3x3"></i> +<%= listdata.additionalImages.length
+                                                        - 4 %> more
+                                                </button>
+                                            </div>
+                                            <% } %>
+                                                <% } else { %>
+                                                    <% for(let i=0; i < 4; i++) { %>
+                                                        <div class="col-6">
+                                                            <div class="bg-light rounded mb-2 w-100 d-flex align-items-center justify-content-center"
+                                                                style="height: 195px;">
+                                                                <i class="bi bi-image text-muted display-4"></i>
+                                                            </div>
+                                                        </div>
+                                                        <% } %>
+                                                            <% } %>
+                        </div>
+                        <!-- View all photos button -->
+                        <% if((listdata.image && listdata.image.url) || (listdata.additionalImages &&
+                            listdata.additionalImages.length> 0)) { %>
+                            <div class="text-end mt-2">
+                                <button class="btn btn-outline-dark btn-sm" onclick="openAllImagesModal()">
+                                    <i class="bi bi-grid-3x3"></i> View all photos (<%= (listdata.image &&
+                                        listdata.image.url ? 1 : 0) + (listdata.additionalImages ?
+                                        listdata.additionalImages.length : 0) %>)
+                                </button>
+                            </div>
+                            <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <!-- Left Column: Property Details -->
+            <div class="col-md-8">
+                <!-- Host Info -->
+                <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                        <h4>
+                            <%= listdata.propertyType || 'Entire place' %> hosted by <%= listdata.owner.username %>
+                        </h4>
+                        <p class="text-muted mb-0">
+                            <%= listdata.accommodates || 1 %> guests •
+                                <%= listdata.bedrooms || 1 %> bedrooms •
+                                    <%= listdata.beds || 1 %> beds •
+                                        <%= listdata.bathrooms || 1 %> baths
+                        </p>
+                    </div>
+                    <div>
+                        <% if(listdata.owner.profile && listdata.owner.profile.profilePicture) { %>
+                            <img src="<%= listdata.owner.profile.profilePicture.url %>" class="rounded-circle"
+                                width="60" height="60" alt="Host">
+                            <% } else { %>
+                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 60px; height: 60px;">
+                                    <i class="bi bi-person display-6 text-white"></i>
+                                </div>
+                                <% } %>
+                    </div>
+                </div>
+
+                <!-- Property Highlights -->
+                <div class="py-4 border-bottom">
+                    <div class="row">
+                        <div class="col-1">
+                            <i class="bi bi-house-door display-6 text-primary"></i>
+                        </div>
+                        <div class="col-11">
+                            <h6>Entire home</h6>
+                            <p class="text-muted">You'll have the <%= listdata.propertyType || 'place' %> to yourself.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-1">
+                            <i class="bi bi-geo-alt display-6 text-primary"></i>
+                        </div>
+                        <div class="col-11">
+                            <h6>Great location</h6>
+                            <p class="text-muted">Located in <%= listdata.location %>, <%= listdata.country %>.</p>
+                        </div>
+                    </div>
+                    <% if(listdata.availability && listdata.availability.instantBook) { %>
+                        <div class="row mt-3">
+                            <div class="col-1">
+                                <i class="bi bi-lightning display-6 text-primary"></i>
+                            </div>
+                            <div class="col-11">
+                                <h6>Instant Book</h6>
+                                <p class="text-muted">Book instantly without waiting for host approval.</p>
+                            </div>
+                        </div>
+                        <% } %>
+                </div>
+
+                <!-- Description -->
+                <div class="py-4 border-bottom">
+                    <h5>About this place</h5>
+                    <p>
+                        <%= listdata.description %>
+                    </p>
+                </div>
+
+                <!-- House Rules Card -->
+                <div class="py-4 border-bottom">
+                    <h5>House rules</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between border rounded p-3">
+                                <span>Check-in</span>
+                                <strong>
+                                    <%= listdata.houseRules?.checkIn || '3:00 PM' %>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between border rounded p-3">
+                                <span>Check-out</span>
+                                <strong>
+                                    <%= listdata.houseRules?.checkOut || '11:00 AM' %>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between border rounded p-3">
+                                <span>Minimum stay</span>
+                                <strong>
+                                    <%= listdata.houseRules?.minStay || 1 %> nights
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between border rounded p-3">
+                                <span>Maximum stay</span>
+                                <strong>
+                                    <%= listdata.houseRules?.maxStay || 1125 %> nights
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between border rounded p-3">
+                                <span>Smoking</span>
+                                <strong>
+                                    <%= listdata.houseRules?.smokingAllowed ? 'Allowed' : 'Not allowed' %>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between border rounded p-3">
+                                <span>Pets</span>
+                                <strong>
+                                    <%= listdata.houseRules?.petsAllowed ? 'Allowed' : 'Not allowed' %>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between border rounded p-3">
+                                <span>Events</span>
+                                <strong>
+                                    <%= listdata.houseRules?.eventsAllowed ? 'Allowed' : 'Not allowed' %>
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amenities -->
+                <% if(listdata.amenities && listdata.amenities.length> 0) { %>
+                    <div class="py-4 border-bottom">
+                        <h5>What this place offers</h5>
+                        <div class="row">
+                            <% listdata.amenities.slice(0, 10).forEach(amenity=> { %>
+                                <div class="col-md-6 mb-2">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    <%= amenity %>
+                                </div>
+                                <% }) %>
+                        </div>
+                        <% if(listdata.amenities.length> 10) { %>
+                            <button class="btn btn-outline-primary mt-3" onclick="showAllAmenities()">
+                                Show all <%= listdata.amenities.length %> amenities
+                            </button>
+                            <% } %>
+                    </div>
+                    <% } %>
+
+                        <!-- Map -->
+                        <div class="py-4 border-bottom">
+                            <h5>Where you'll be</h5>
+                            <div id="map" style="height: 400px;" class="rounded"></div>
+                            <p class="mt-3 text-muted">
+                                <strong>
+                                    <%= listdata.location %>, <%= listdata.country %>
+                                </strong><br>
+                                Exact location provided after booking.
+                            </p>
+                        </div>
+
+                        <!-- Host Information -->
+                        <div class="py-4 border-bottom">
+                            <div class="row">
+                                <div class="col-auto">
+                                    <% if(listdata.owner.profile && listdata.owner.profile.profilePicture) { %>
+                                        <img src="<%= listdata.owner.profile.profilePicture.url %>"
+                                            class="rounded-circle" width="80" height="80" alt="Host">
+                                        <% } else { %>
+                                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 80px; height: 80px;">
+                                                <i class="bi bi-person display-5 text-white"></i>
+                                            </div>
+                                            <% } %>
+                                </div>
+                                <div class="col">
+                                    <h4>
+                                        <%= listdata.owner.username %>
+                                    </h4>
+                                    <p class="text-muted">
+                                        <%= listdata.owner.profile?.bio || 'No bio available' %>
+                                    </p>
+                                </div>
+                                <div class="col">
+                                    <h5>Hosted by <%= listdata.owner.username %>
+                                    </h5>
+                                    <p class="text-muted">
+                                        <% if(listdata.owner.host && listdata.owner.host.hostSince) { %>
+                                            Host since <%= new Date(listdata.owner.host.hostSince).toLocaleDateString()
+                                                %>
+                                                <% } else { %>
+                                                    New host
+                                                    <% } %>
+                                    </p>
+                                    <% if(listdata.owner.host) { %>
+                                        <p>
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                            <%= listdata.owner.host.hostRating || 5.0 %> rating •
+                                                <%= listdata.owner.host.totalReviews || 0 %> reviews •
+                                                    Response time: <%= listdata.owner.host.responseTime
+                                                        || 'within a few hours' %>
+                                        </p>
+                                        <% } %>
+                                            <% if(listdata.owner.profile && listdata.owner.profile.bio) { %>
+                                                <p>
+                                                    <%= listdata.owner.profile.bio %>
+                                                </p>
+                                                <% } %>
+                                                    <div class="mt-3">
+                                                        <a href="/profile/<%= listdata.owner._id %>"
+                                                            class="btn btn-outline-primary">
+                                                            View Profile
+                                                        </a>
+                                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reviews Section -->
+                        <div id="reviews" class="reviews-section mobile-reviews-last">
+                            <div class="reviews-header">
+                                <h5>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <%= parseFloat(listdata.rating.overall || 5.0).toFixed(1) %> • <%= listdata.reviews.length %> <%= listdata.reviews.length === 1 ? 'review' : 'reviews' %>
+                                </h5>
+                                <% if(listdata.reviews.length > 0) { %>
+                                <div class="review-filters">
+                                    <button class="filter-btn active" data-filter="all">All</button>
+                                    <button class="filter-btn" data-filter="5">5 Stars</button>
+                                    <button class="filter-btn" data-filter="4">4 Stars</button>
+                                    <button class="filter-btn" data-filter="3">3 Stars</button>
+                                    <button class="filter-btn" data-filter="2">2 Stars</button>
+                                    <button class="filter-btn" data-filter="1">1 Star</button>
+                                </div>
+                                <% } %>
+                            </div>
+
+                            <% if(listdata.reviews.length > 0) { %>
+                                <div class="reviews-grid">
+                                    <% listdata.reviews.slice(0, 12).forEach((review, index) => { %>
+                                        <div class="review-card" 
+                                             data-rating="<%= review.rating %>" 
+                                             data-date="<%= review.created_at %>"
+                                             data-helpful="<%= review.helpfulCount || 0 %>"
+                                             <%= index >= 6 ? 'style="display: none;"' : '' %>>
+                                            <div class="review-header">
+                                                <% if(review.author.profile && review.author.profile.profilePicture) { %>
+                                                    <img src="<%= review.author.profile.profilePicture.url %>"
+                                                        class="reviewer-avatar" alt="<%= review.author.username %>">
+                                                <% } else { %>
+                                                    <div class="reviewer-avatar-placeholder">
+                                                        <%= review.author.username.charAt(0).toUpperCase() %>
+                                                    </div>
+                                                <% } %>
+                                                <div class="reviewer-info">
+                                                    <div class="reviewer-name">
+                                                        <%= review.author.username %>
+                                                        <% if(review.isVerified) { %>
+                                                            <span class="verified-badge">
+                                                                <i class="bi bi-check-circle-fill"></i> Verified
+                                                            </span>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="review-date">
+                                                        <%= new Date(review.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                                                        <% if(review.edited) { %>
+                                                            <span class="edited-badge">(edited)</span>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="review-rating">
+                                                <% for(let i=1; i <=5; i++) { %>
+                                                    <i class="bi bi-star<%= i <= review.rating ? '-fill' : '' %> star-rating"></i>
+                                                <% } %>
+                                            </div>
+                                            <p class="review-comment"><%= review.comment %></p>
+                                            <div class="review-footer">
+                                                <button type="button" 
+                                                        class="helpful-btn <%= currUser && review.helpfulUsers && review.helpfulUsers.length > 0 && review.helpfulUsers.some(u => u && u.toString() === currUser._id.toString()) ? 'active' : '' %>" 
+                                                        data-review-id="<%= review._id %>" 
+                                                        data-listing-id="<%= listdata._id %>"
+                                                        <%= !currUser ? 'disabled title="Please log in to mark as helpful"' : '' %>>
+                                                    <i class="bi bi-hand-thumbs-up<%= currUser && review.helpfulUsers && review.helpfulUsers.length > 0 && review.helpfulUsers.some(u => u && u.toString() === currUser._id.toString()) ? '-fill' : '' %>"></i>
+                                                    <span class="helpful-count"><%= review.helpfulCount || 0 %></span>
+                                                    <span>Helpful</span>
+                                                </button>
+                                                <div class="review-actions">
+                                                    <% if(currUser && currUser._id.equals(review.author._id)) { %>
+                                                        <button class="btn btn-outline-primary btn-sm" onclick="editReview('<%= review._id %>')">Edit</button>
+                                                        <form action="/listings/<%= listdata._id %>/reviews/<%= review._id %>?_method=delete"
+                                                            method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                                                            <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                                                        </form>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                                
+                                <% if(listdata.reviews.length > 12) { %>
+                                    <div class="show-more-reviews">
+                                        <button class="btn btn-outline-primary show-more-reviews-btn" onclick="showMoreReviews()">
+                                            Show all <%= listdata.reviews.length %> reviews
+                                        </button>
+                                    </div>
+                                <% } %>
+
+                                        <!-- Add Review Form -->
+                                        <% if(currUser && !currUser._id.equals(listdata.owner._id)) { %>
+                                            <div class="review-form-container">
+                                                <h6 class="review-form-title">Leave a review</h6>
+                                                <form action="/listings/<%= listdata._id %>/reviews" method="post"
+                                                    class="needs-validation" novalidate>
+                                                    <div class="mb-3">
+                                                        <label for="rating" class="form-label">Overall Rating</label>
+                                                        <div class="star-rating-input">
+                                                            <input type="radio" id="rate1" name="review[rating]" value="1">
+                                                            <label for="rate1"><i class="bi bi-star-fill"></i></label>
+                                                            <input type="radio" id="rate2" name="review[rating]" value="2">
+                                                            <label for="rate2"><i class="bi bi-star-fill"></i></label>
+                                                            <input type="radio" id="rate3" name="review[rating]" value="3">
+                                                            <label for="rate3"><i class="bi bi-star-fill"></i></label>
+                                                            <input type="radio" id="rate4" name="review[rating]" value="4">
+                                                            <label for="rate4"><i class="bi bi-star-fill"></i></label>
+                                                            <input type="radio" id="rate5" name="review[rating]" value="5" required>
+                                                            <label for="rate5"><i class="bi bi-star-fill"></i></label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="comment" class="form-label">Comment</label>
+                                                        <textarea name="review[comment]" id="comment" rows="4"
+                                                            class="form-control review-textarea" placeholder="Share your experience..."
+                                                            required maxlength="2000"></textarea>
+                                                        <div class="char-count">0 / 2000 characters</div>
+                                                        <div class="invalid-feedback">Please enter a comment</div>
+                                                    </div>
+                                                    <button type="submit" class="enhanced-reserve-btn" style="margin-bottom: 0;">Submit Review</button>
+                                                </form>
+                                            </div>
+                                            <% } %>
+                                                <% } else { %>
+                                                    <div class="no-reviews">
+                                                        <div class="no-reviews-icon">
+                                                            <i class="bi bi-chat-left-text"></i>
+                                                        </div>
+                                                        <h5>No reviews yet</h5>
+                                                        <p class="text-muted">Be the first to review this place!</p>
+                                                    </div>
+
+                                                    <!-- Add Review Form for no reviews -->
+                                                    <% if(currUser && !currUser._id.equals(listdata.owner._id)) { %>
+                                                        <div class="review-form-container">
+                                                            <h6 class="review-form-title">Be the first to leave a review</h6>
+                                                            <form action="/listings/<%= listdata._id %>/reviews"
+                                                                method="post" class="needs-validation" novalidate>
+                                                                <div class="mb-3">
+                                                                    <label for="rating2" class="form-label">Overall Rating</label>
+                                                                    <div class="star-rating-input">
+                                                                        <input type="radio" id="rate2-1" name="review[rating]" value="1">
+                                                                        <label for="rate2-1"><i class="bi bi-star-fill"></i></label>
+                                                                        <input type="radio" id="rate2-2" name="review[rating]" value="2">
+                                                                        <label for="rate2-2"><i class="bi bi-star-fill"></i></label>
+                                                                        <input type="radio" id="rate2-3" name="review[rating]" value="3">
+                                                                        <label for="rate2-3"><i class="bi bi-star-fill"></i></label>
+                                                                        <input type="radio" id="rate2-4" name="review[rating]" value="4">
+                                                                        <label for="rate2-4"><i class="bi bi-star-fill"></i></label>
+                                                                        <input type="radio" id="rate2-5" name="review[rating]" value="5" required>
+                                                                        <label for="rate2-5"><i class="bi bi-star-fill"></i></label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="comment2" class="form-label">Comment</label>
+                                                                    <textarea name="review[comment]" id="comment2"
+                                                                        rows="4" class="form-control review-textarea"
+                                                                        placeholder="Share your experience..."
+                                                                        required maxlength="2000"></textarea>
+                                                                    <div class="char-count">0 / 2000 characters</div>
+                                                                    <div class="invalid-feedback">Please enter a comment</div>
+                                                                </div>
+                                                                <button type="submit" class="enhanced-reserve-btn" style="margin-bottom: 0;">Submit Review</button>
+                                                            </form>
+                                                        </div>
+                                                    <% } %>
+                                                <% } %>
+                        </div>
+
+                        <!-- Owner Actions -->
+                        <% if(currUser && currUser._id.equals(listdata.owner._id)) { %>
+                            <div class="py-4 border-top">
+                                <h6>Property Management</h6>
+                                <div class="d-flex gap-2">
+                                    <a href="/listings/<%= listdata._id %>/edit" class="btn btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Edit Listing
+                                    </a>
+                                    <form action="/listings/<%= listdata._id %>?_method=delete" method="post"
+                                        class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger"
+                                            onclick="return confirm('Are you sure you want to delete this listing?')">
+                                            <i class="bi bi-trash"></i> Delete Listing
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <% } %>
+            </div>
+
+            <!-- Right Column: Enhanced Booking Card -->
+            <div class="col-md-4">
+                <div class="enhanced-booking-card">
+                    <!-- Booking Card Header -->
+                    <div class="booking-card-header">
+                        <div class="price-display">
+                            <div>
+                                <span class="price-amount">₹<%= listdata.price %></span>
+                                <span class="price-per">per night</span>
+                            </div>
+                            <div class="rating-summary">
+                                <span class="rating-star">★</span>
+                                <span>
+                                    <%= listdata.rating.overall || 5.0 %>
+                                </span>
+                                <span>(<%= listdata.reviews.length %>)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <div class="booking-form-container">
+                        <% if(currUser && !currUser._id.equals(listdata.owner._id)) { %>
+                            <!-- Date Selection -->
+                            <div class="date-inputs" id="dateInputs">
+                                <div class="date-input-group" id="checkInGroup">
+                                    <div class="date-label">CHECK-IN</div>
+                                    <div class="date-value placeholder" id="checkInDisplay">Add date</div>
+                                </div>
+                                <div class="date-input-group" id="checkOutGroup">
+                                    <div class="date-label">CHECK-OUT</div>
+                                    <div class="date-value placeholder" id="checkOutDisplay">Add date</div>
+                                </div>
+                            </div>
+
+                            <!-- Guest Selection -->
+                            <div class="guests-selector" id="guestsSelector">
+                                <div class="guests-label">GUESTS</div>
+                                <div class="guests-value">
+                                    <span id="guestsDisplay">1 guest</span>
+                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
+                                </div>
+                            </div>
+
+                            <!-- Reserve Button -->
+                            <form id="bookingForm" action="/bookings/listings/<%= listdata._id %>/book" method="GET">
+                                <input type="hidden" name="checkIn" id="checkInInput">
+                                <input type="hidden" name="checkOut" id="checkOutInput">
+                                <input type="hidden" name="guests" id="guestsInput" value="1">
+                                <input type="hidden" name="adults" id="adultsInput" value="1">
+                                <input type="hidden" name="children" id="childrenInput" value="0">
+                                <input type="hidden" name="infants" id="infantsInput" value="0">
+                                <input type="hidden" name="nights" id="nightsInput">
+                                <input type="hidden" name="basePrice" id="basePriceInput">
+                                <input type="hidden" name="serviceFee" id="serviceFeeInput">
+                                <input type="hidden" name="taxes" id="taxesInput">
+                                <input type="hidden" name="totalPrice" id="totalPriceInput">
+
+                                <button type="submit" class="enhanced-reserve-btn" id="reserveBtn">
+                                    <span id="reserveBtnText">Reserve</span>
+                                    <div class="loading-spinner hidden" id="loadingSpinner"></div>
+                                </button>
+                            </form>
+
+                            <p class="booking-note">You won't be charged yet</p>
+
+                            <!-- Price Breakdown -->
+                            <div class="price-breakdown hidden" id="priceBreakdown">
+                                <div class="price-row">
+                                    <span id="basePrice">₹<%= listdata.price %> x 1 night</span>
+                                    <span id="basePriceAmount">₹<%= listdata.price %></span>
+                                </div>
+                                <div class="price-row tooltip-trigger" data-tooltip="One-time cleaning fee">
+                                    <span>Cleaning fee</span>
+                                    <span id="cleaningFee">₹0</span>
+                                </div>
+                                <div class="price-row tooltip-trigger" data-tooltip="Platform service fee">
+                                    <span>Service fee</span>
+                                    <span id="serviceFee">₹0</span>
+                                </div>
+                                <div class="price-row tooltip-trigger" data-tooltip="Local taxes and fees">
+                                    <span>Taxes</span>
+                                    <span id="taxes">₹0</span>
+                                </div>
+                                <div class="price-row price-total">
+                                    <span>Total</span>
+                                    <span id="totalPrice">₹<%= listdata.price %></span>
+                                </div>
+                            </div>
+
+                            <% } else if(currUser && currUser._id.equals(listdata.owner._id)) { %>
+                                <div class="text-center py-4">
+                                    <div class="mb-3">
+                                        <i class="bi bi-house-check display-4 text-muted"></i>
+                                    </div>
+                                    <h6 class="mb-2">This is your listing</h6>
+                                    <p class="text-muted mb-3">You cannot book your own property</p>
+                                    <a href="/profile/dashboard/host" class="btn btn-outline-primary">
+                                        <i class="bi bi-graph-up"></i> View Host Dashboard
+                                    </a>
+                                </div>
+                                <% } else { %>
+                                    <div class="text-center py-4">
+                                        <div class="mb-3">
+                                            <i class="bi bi-person-circle display-4 text-muted"></i>
+                                        </div>
+                                        <h6 class="mb-2">Sign in to book</h6>
+                                        <p class="text-muted mb-3">Create an account or sign in to make a reservation
+                                        </p>
+                                        <div class="d-grid gap-2">
+                                            <a href="/login" class="btn btn-primary">
+                                                <i class="bi bi-box-arrow-in-right"></i> Sign In
+                                            </a>
+                                            <a href="/signup" class="btn btn-outline-primary">
+                                                <i class="bi bi-person-plus"></i> Create Account
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Calendar Modal -->
+    <div class="modal fade calendar-modal" id="calendarModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="calendar-header-enhanced">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            Select your dates
+                        </h4>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle bg-white" style="width: 20px; height: 20px;"></div>
+                                <small>Available</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle bg-secondary" style="width: 20px; height: 20px;"></div>
+                                <small>Booked</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle"
+                                    style="width: 20px; height: 20px; background: var(--primary-color);"></div>
+                                <small>Selected</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calendar-container">
+                    <!-- Current Month -->
+                    <div class="calendar-month">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="prevMonth">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <h5 class="month-header" id="currentMonth">August 2025</h5>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="nextMonth">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="calendar-grid" id="calendar1">
+                            <!-- Calendar will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Next Month -->
+                    <div class="calendar-month">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div style="width: 32px;"></div>
+                            <h5 class="month-header" id="nextMonthHeader">September 2025</h5>
+                            <div style="width: 32px;"></div>
+                        </div>
+                        <div class="calendar-grid" id="calendar2">
+                            <!-- Calendar will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" id="clearDates">
+                        <i class="bi bi-x-circle"></i> Clear dates
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmDates" disabled>
+                        <i class="bi bi-check-circle"></i> Confirm dates
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Guest Selector Modal -->
+    <div class="modal fade guest-modal" id="guestModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-people me-2"></i>
+                        Guests
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="guest-control">
+                        <div class="guest-info">
+                            <h6>Total guests</h6>
+                            <p>Up to <%= listdata.accommodates || 10 %> guests</p>
+                        </div>
+                        <div class="counter-controls">
+                            <button type="button" class="counter-btn" id="totalDecrease">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <span class="counter-value" id="totalCount">1</span>
+                            <button type="button" class="counter-btn" id="totalIncrease">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmGuests">
+                        <i class="bi bi-check-circle"></i> Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                <!-- Toast message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced JavaScript functionality for integrated booking
+        class BookingManager {
+            constructor() {
+                this.selectedCheckIn = null;
+                this.selectedCheckOut = null;
+                this.totalGuests = 1;
+                this.currentMonth = new Date().getMonth();
+                this.currentYear = new Date().getFullYear();
+                this.bookedDates = [];
+                this.listingPrice = <%= listdata.price || 0 %>;
+                this.maxGuests = <%= listdata.accommodates || 10 %>;
+                this.minStay = <%= listdata.houseRules?.minStay || 1 %>;
+                this.maxStay = <%= listdata.houseRules?.maxStay || 1125 %>;
+                this.isLoading = false;
+
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadBookedDates();
+                this.updateGuestsDisplay();
+
+                // Set minimum date to today
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+            }
+
+            setupEventListeners() {
+                // Date input clicks
+                document.getElementById('checkInGroup').addEventListener('click', () => {
+                    this.openCalendar();
+                });
+
+                document.getElementById('checkOutGroup').addEventListener('click', () => {
+                    this.openCalendar();
+                });
+
+                // Guest selector click
+                document.getElementById('guestsSelector').addEventListener('click', () => {
+                    this.openGuestModal();
+                });
+
+                // Calendar navigation
+                document.getElementById('prevMonth')?.addEventListener('click', () => {
+                    this.navigateMonth(-1);
+                });
+
+                document.getElementById('nextMonth')?.addEventListener('click', () => {
+                    this.navigateMonth(1);
+                });
+
+                // Calendar actions
+                document.getElementById('clearDates')?.addEventListener('click', () => {
+                    this.clearDates();
+                });
+
+                document.getElementById('confirmDates')?.addEventListener('click', () => {
+                    this.confirmDates();
+                });
+
+                // Guest counter buttons
+                this.setupGuestCounters();
+
+                // Confirm guests
+                document.getElementById('confirmGuests')?.addEventListener('click', () => {
+                    this.confirmGuests();
+                });
+
+                // Booking form submission
+                document.getElementById('bookingForm')?.addEventListener('submit', (e) => {
+                    this.handleBookingSubmit(e);
+                });
+            }
+
+            setupGuestCounters() {
+                console.log('Setting up guest counter buttons');
+                
+                // Setup total guest counter buttons
+                const decreaseBtn = document.getElementById('totalDecrease');
+                const increaseBtn = document.getElementById('totalIncrease');
+
+                if (decreaseBtn) {
+                    console.log('Adding event listener to totalDecrease button');
+                    decreaseBtn.onclick = () => {
+                        console.log('totalDecrease clicked');
+                        this.changeGuestCount('total', -1);
+                    };
+                } else {
+                    console.error('totalDecrease button not found');
+                }
+
+                if (increaseBtn) {
+                    console.log('Adding event listener to totalIncrease button');
+                    increaseBtn.onclick = () => {
+                        console.log('totalIncrease clicked');
+                        this.changeGuestCount('total', 1);
+                    };
+                } else {
+                    console.error('totalIncrease button not found');
+                }
+            }
+
+            async loadBookedDates() {
+                try {
+                    const response = await fetch(`/listings/<%= listdata._id %>/booked-dates`);
+                    if (response.ok) {
+                        this.bookedDates = await response.json();
+                    }
+                } catch (error) {
+                    console.error('Error loading booked dates:', error);
+                }
+            }
+
+            openCalendar() {
+                const modal = new bootstrap.Modal(document.getElementById('calendarModal'));
+                modal.show();
+
+                setTimeout(() => {
+                    this.renderCalendars();
+                }, 300);
+            }
+
+            renderCalendars() {
+                this.renderCalendar('calendar1', this.currentYear, this.currentMonth);
+                this.renderCalendar('calendar2', this.currentYear, this.currentMonth + 1);
+
+                // Update month headers
+                const currentMonthName = new Date(this.currentYear, this.currentMonth).toLocaleString('default', {
+                    month: 'long',
+                    year: 'numeric'
+                });
+                const nextMonthName = new Date(this.currentYear, this.currentMonth + 1).toLocaleString('default', {
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                document.getElementById('currentMonth').textContent = currentMonthName;
+                document.getElementById('nextMonthHeader').textContent = nextMonthName;
+
+                this.updateCalendarSelection();
+            }
+
+            renderCalendar(containerId, year, month) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                // Adjust month if it goes beyond December
+                let adjustedYear = year;
+                let adjustedMonth = month;
+
+                if (month > 11) {
+                    adjustedYear = year + 1;
+                    adjustedMonth = month - 12;
+                }
+
+                container.innerHTML = '';
+
+                // Add day headers
+                const dayHeaders = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+                dayHeaders.forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'calendar-day-header';
+                    header.textContent = day;
+                    container.appendChild(header);
+                });
+
+                const firstDay = new Date(adjustedYear, adjustedMonth, 1).getDay();
+                const daysInMonth = new Date(adjustedYear, adjustedMonth + 1, 0).getDate();
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                // Add empty cells for days before the first day
+                for (let i = 0; i < firstDay; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'calendar-day empty';
+                    container.appendChild(emptyDay);
+                }
+
+                // Add calendar days
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = day;
+
+                    const date = new Date(adjustedYear, adjustedMonth, day);
+
+                    // Add today class
+                    if (date.getTime() === today.getTime()) {
+                        dayElement.classList.add('today');
+                    }
+
+                    // Check if date is in the past
+                    if (date <= today) {
+                        dayElement.classList.add('disabled');
+                    } else {
+                        // Check if date is booked
+                        const isBooked = this.bookedDates.some(booking => {
+                            const start = new Date(booking.checkIn);
+                            const end = new Date(booking.checkOut);
+                            return date >= start && date < end;
+                        });
+
+                        if (isBooked) {
+                            dayElement.classList.add('disabled');
+                            dayElement.title = 'Not available';
+                        } else {
+                            dayElement.addEventListener('click', () => this.selectDate(date));
+                            dayElement.title = `Available - ${date.toLocaleDateString()}`;
+                        }
+                    }
+
+                    container.appendChild(dayElement);
+                }
+            }
+
+            selectDate(date) {
+                if (!this.selectedCheckIn || (this.selectedCheckIn && this.selectedCheckOut)) {
+                    // First selection or reset
+                    this.selectedCheckIn = new Date(date);
+                    this.selectedCheckOut = null;
+                } else if (date > this.selectedCheckIn) {
+                    // Valid check-out date
+                    this.selectedCheckOut = new Date(date);
+                } else {
+                    // Earlier date selected, reset
+                    this.selectedCheckIn = new Date(date);
+                    this.selectedCheckOut = null;
+                }
+
+                this.updateCalendarSelection();
+                this.updateDateDisplay();
+
+                // Enable confirm button if both dates are selected
+                const confirmBtn = document.getElementById('confirmDates');
+                if (confirmBtn) {
+                    confirmBtn.disabled = !(this.selectedCheckIn && this.selectedCheckOut);
+                }
+            }
+
+            updateCalendarSelection() {
+                // Clear all selections
+                document.querySelectorAll('.calendar-day').forEach(day => {
+                    day.classList.remove('selected', 'in-range', 'range-start', 'range-end');
+                });
+
+                if (this.selectedCheckIn) {
+                    const checkInElement = this.findDayElement(this.selectedCheckIn);
+                    if (checkInElement) {
+                        checkInElement.classList.add('selected', 'range-start');
+                    }
+                }
+
+                if (this.selectedCheckOut) {
+                    const checkOutElement = this.findDayElement(this.selectedCheckOut);
+                    if (checkOutElement) {
+                        checkOutElement.classList.add('selected', 'range-end');
+                    }
+
+                    // Highlight range
+                    const current = new Date(this.selectedCheckIn);
+                    current.setDate(current.getDate() + 1);
+
+                    while (current < this.selectedCheckOut) {
+                        const dayElement = this.findDayElement(current);
+                        if (dayElement && !dayElement.classList.contains('disabled')) {
+                            dayElement.classList.add('in-range');
+                        }
+                        current.setDate(current.getDate() + 1);
+                    }
+                }
+            }
+
+            findDayElement(targetDate) {
+                const dayElements = document.querySelectorAll('.calendar-day:not(.empty):not(.calendar-day-header)');
+
+                for (let dayElement of dayElements) {
+                    if (!dayElement.textContent || dayElement.classList.contains('calendar-day-header')) continue;
+
+                    const dayNumber = parseInt(dayElement.textContent);
+                    if (isNaN(dayNumber)) continue;
+
+                    // Get the calendar container to determine which month this day belongs to
+                    const calendarContainer = dayElement.closest('[id^="calendar"]');
+                    if (!calendarContainer) continue;
+
+                    let monthOffset = 0;
+                    if (calendarContainer.id === 'calendar2') {
+                        monthOffset = 1;
+                    }
+
+                    const dayDate = new Date(this.currentYear, this.currentMonth + monthOffset, dayNumber);
+
+                    if (dayDate.getTime() === targetDate.getTime()) {
+                        return dayElement;
+                    }
+                }
+
+                return null;
+            }
+
+            navigateMonth(direction) {
+                this.currentMonth += direction;
+
+                if (this.currentMonth < 0) {
+                    this.currentMonth = 11;
+                    this.currentYear--;
+                } else if (this.currentMonth > 11) {
+                    this.currentMonth = 0;
+                    this.currentYear++;
+                }
+
+                this.renderCalendars();
+            }
+
+            clearDates() {
+                this.selectedCheckIn = null;
+                this.selectedCheckOut = null;
+                this.updateDateDisplay();
+                this.updateCalendarSelection();
+                this.hidePriceBreakdown();
+
+                const confirmBtn = document.getElementById('confirmDates');
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                }
+            }
+
+            confirmDates() {
+                if (this.selectedCheckIn && this.selectedCheckOut) {
+                    this.updateDateDisplay();
+                    this.checkAvailability();
+
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('calendarModal'));
+                    modal?.hide();
+
+                    this.showToast('Dates selected successfully!');
+                }
+            }
+
+            updateDateDisplay() {
+                const checkInDisplay = document.getElementById('checkInDisplay');
+                const checkOutDisplay = document.getElementById('checkOutDisplay');
+
+                if (this.selectedCheckIn) {
+                    checkInDisplay.textContent = this.selectedCheckIn.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    checkInDisplay.classList.remove('placeholder');
+
+                    // Update hidden input
+                    document.getElementById('checkInInput').value = this.selectedCheckIn.toISOString().split('T')[0];
+                } else {
+                    checkInDisplay.textContent = 'Add date';
+                    checkInDisplay.classList.add('placeholder');
+                }
+
+                if (this.selectedCheckOut) {
+                    checkOutDisplay.textContent = this.selectedCheckOut.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    checkOutDisplay.classList.remove('placeholder');
+
+                    // Update hidden input
+                    document.getElementById('checkOutInput').value = this.selectedCheckOut.toISOString().split('T')[0];
+                } else {
+                    checkOutDisplay.textContent = this.selectedCheckIn ? 'Add date' : 'Add date';
+                    checkOutDisplay.classList.add('placeholder');
+                }
+            }
+
+            openGuestModal() {
+                const modal = new bootstrap.Modal(document.getElementById('guestModal'));
+                modal.show();
+
+                // Update counter in modal
+                document.getElementById('totalCount').textContent = this.totalGuests;
+
+                // Update button states when modal opens
+                this.updateGuestCounterButtons();
+            }
+
+            changeGuestCount(type, change) {
+                console.log(`Changing ${type} by ${change}`);
+
+                if (type === 'total') {
+                    const newCount = this.totalGuests + change;
+                    console.log(`Current total guests: ${this.totalGuests}, New count: ${newCount}`);
+
+                    // Check limits
+                    if (newCount >= 1 && newCount <= this.maxGuests) {
+                        this.totalGuests = newCount;
+
+                        // Update display
+                        const countElement = document.getElementById('totalCount');
+                        if (countElement) {
+                            countElement.textContent = newCount;
+                            console.log(`Updated total guest display to ${newCount}`);
+                        } else {
+                            console.error('Element totalCount not found');
+                        }
+
+                        // Update button states
+                        this.updateGuestCounterButtons();
+                    } else {
+                        console.log(`Cannot update total guests to ${newCount} (min: 1, max: ${this.maxGuests})`);
+                    }
+                }
+            }
+
+            updateGuestCounterButtons() {
+                console.log('Updating button states, current total guests:', this.totalGuests);
+                console.log('Max guests:', this.maxGuests);
+
+                const decreaseBtn = document.getElementById('totalDecrease');
+                const increaseBtn = document.getElementById('totalIncrease');
+
+                if (!decreaseBtn || !increaseBtn) {
+                    console.log('Button elements not found');
+                    return;
+                }
+
+                // Handle decrease button state (minimum 1 guest)
+                decreaseBtn.disabled = this.totalGuests <= 1;
+                
+                // Handle increase button state (maximum based on accommodates)
+                increaseBtn.disabled = this.totalGuests >= this.maxGuests;
+
+                console.log(`Total guest buttons: decrease=${decreaseBtn.disabled}, increase=${increaseBtn.disabled}`);
+            }
+
+            confirmGuests() {
+                this.updateGuestsDisplay();
+                this.checkAvailability();
+
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('guestModal'));
+                modal?.hide();
+
+                this.showToast('Guest count updated!');
+            }
+
+            updateGuestsDisplay() {
+                let guestText = '';
+
+                if (this.totalGuests === 1) {
+                    guestText = '1 guest';
+                } else {
+                    guestText = `${this.totalGuests} guests`;
+                }
+
+                document.getElementById('guestsDisplay').textContent = guestText;
+                document.getElementById('guestsInput').value = this.totalGuests;
+            }
+
+            async checkAvailability() {
+                if (!this.selectedCheckIn || !this.selectedCheckOut) {
+                    this.hidePriceBreakdown();
+                    return;
+                }
+
+                try {
+                    this.setLoadingState(true);
+
+                    // Simply calculate pricing and enable button without API call
+                    // since the calendar already handles blocked dates from loadBookedDates()
+                    // Calculate and show pricing
+                    this.calculatePricing();
+                    this.showPriceBreakdown();
+                    this.enableReserveButton();
+
+                    // Validate dates and stay length against house rules
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (this.selectedCheckIn < today) {
+                        this.showUnavailable('Check-in date cannot be in the past');
+                        this.disableReserveButton();
+                        this.hidePriceBreakdown();
+                        return;
+                    }
+
+                    if (this.selectedCheckOut <= this.selectedCheckIn) {
+                        this.showUnavailable('Check-out date must be after check-in date');
+                        this.disableReserveButton();
+                        this.hidePriceBreakdown();
+                        return;
+                    }
+
+                    const nights = Math.ceil((this.selectedCheckOut - this.selectedCheckIn) / (1000 * 60 * 60 * 24));
+                    if (nights < this.minStay) {
+                        this.showUnavailable(`Minimum stay is ${this.minStay} night${this.minStay > 1 ? 's' : ''}`);
+                        this.disableReserveButton();
+                        this.hidePriceBreakdown();
+                        return;
+                    }
+                    if (nights > this.maxStay) {
+                        this.showUnavailable(`Maximum stay is ${this.maxStay} nights`);
+                        this.disableReserveButton();
+                        this.hidePriceBreakdown();
+                        return;
+                    }
+
+                    // Check if the date range conflicts with any booked dates
+                    const hasConflict = this.bookedDates.some(booking => {
+                        const start = new Date(booking.checkIn);
+                        const end = new Date(booking.checkOut);
+
+                        // Check if our selected dates overlap with any booking
+                        return (this.selectedCheckIn < end && this.selectedCheckOut > start);
+                    });
+
+                    if (hasConflict) {
+                        this.showUnavailable('Selected dates are not available');
+                        this.disableReserveButton();
+                        this.hidePriceBreakdown();
+                        return;
+                    }
+
+                } catch (error) {
+                    console.error('Error checking availability:', error);
+                    this.showError('Unable to check availability. Please try again.');
+                    this.disableReserveButton();
+                } finally {
+                    this.setLoadingState(false);
+                }
+
+                // Calculate pricing based on selected dates
+                const nights = Math.ceil((this.selectedCheckOut - this.selectedCheckIn) / (1000 * 60 * 60 * 24));
+                const basePrice = this.listingPrice * nights;
+                const cleaningFee = Math.round(basePrice * 0.1); // 10% cleaning fee
+                const serviceFee = Math.round(basePrice * 0.14); // 14% service fee
+                const taxes = Math.round((basePrice + cleaningFee + serviceFee) * 0.12); // 12% taxes on subtotal
+                const totalPrice = basePrice + cleaningFee + serviceFee + taxes;
+
+                // Update price breakdown
+                document.getElementById('basePrice').textContent = `₹${this.listingPrice} x ${nights} night${nights > 1 ? 's' : ''}`;
+                document.getElementById('basePriceAmount').textContent = `₹${basePrice}`;
+                document.getElementById('cleaningFee').textContent = `₹${cleaningFee}`;
+                document.getElementById('serviceFee').textContent = `₹${serviceFee}`;
+                document.getElementById('taxes').textContent = `₹${taxes}`;
+                document.getElementById('totalPrice').textContent = `₹${totalPrice}`;
+            }
+
+            calculatePricing() {
+                const nights = Math.ceil((this.selectedCheckOut - this.selectedCheckIn) / (1000 * 60 * 60 * 24));
+                const basePrice = this.listingPrice * nights;
+                const cleaningFee = Math.round(basePrice * 0.1); // 10% cleaning fee
+                const serviceFee = Math.round(basePrice * 0.14); // 14% service fee
+                const taxes = Math.round((basePrice + cleaningFee + serviceFee) * 0.12); // 12% taxes on subtotal
+                const totalPrice = basePrice + cleaningFee + serviceFee + taxes;
+
+                // Update price breakdown
+                document.getElementById('basePrice').textContent = `₹${this.listingPrice} x ${nights} night${nights > 1 ? 's' : ''}`;
+                document.getElementById('basePriceAmount').textContent = `₹${basePrice}`;
+                document.getElementById('cleaningFee').textContent = `₹${cleaningFee}`;
+                document.getElementById('serviceFee').textContent = `₹${serviceFee}`;
+                document.getElementById('taxes').textContent = `₹${taxes}`;
+                document.getElementById('totalPrice').textContent = `₹${totalPrice}`;
+            }
+
+            showPriceBreakdown() {
+                const breakdown = document.getElementById('priceBreakdown');
+                if (breakdown) {
+                    breakdown.classList.remove('hidden');
+                    breakdown.classList.add('visible');
+                }
+            }
+
+            hidePriceBreakdown() {
+                const breakdown = document.getElementById('priceBreakdown');
+                if (breakdown) {
+                    breakdown.classList.add('hidden');
+                    breakdown.classList.remove('visible');
+                }
+            }
+
+            enableReserveButton() {
+                const btn = document.getElementById('reserveBtn');
+                const btnText = document.getElementById('reserveBtnText');
+
+                if (btn && btnText) {
+                    btn.disabled = false;
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('enhanced-reserve-btn');
+                    btnText.textContent = 'Reserve';
+                    console.log('Reserve button enabled');
+                }
+            }
+
+            disableReserveButton() {
+                const btn = document.getElementById('reserveBtn');
+                const btnText = document.getElementById('reserveBtnText');
+
+                if (btn && btnText) {
+                    btn.disabled = true;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-secondary');
+                    btnText.textContent = 'Select dates to reserve';
+                }
+            }
+
+            setLoadingState(loading) {
+                const btn = document.getElementById('reserveBtn');
+                const btnText = document.getElementById('reserveBtnText');
+                const spinner = document.getElementById('loadingSpinner');
+
+                if (loading) {
+                    btn.disabled = true;
+                    btnText.classList.add('hidden');
+                    spinner.classList.remove('hidden');
+                } else {
+                    btnText.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                }
+
+                this.isLoading = loading;
+            }
+
+            showUnavailable(message) {
+                this.showToast(message || 'Selected dates are not available', 'error');
+            }
+
+            showError(message) {
+                this.showToast(message, 'error');
+            }
+
+            showToast(message, type = 'success') {
+                const toast = document.getElementById('successToast');
+                const toastMessage = document.getElementById('toastMessage');
+                const toastHeader = toast.querySelector('.toast-header');
+
+                if (toast && toastMessage) {
+                    toastMessage.textContent = message;
+
+                    // Update toast style based on type
+                    if (type === 'error') {
+                        toastHeader.querySelector('i').className = 'bi bi-exclamation-circle-fill text-danger me-2';
+                        toastHeader.querySelector('strong').textContent = 'Error';
+                    } else {
+                        toastHeader.querySelector('i').className = 'bi bi-check-circle-fill text-success me-2';
+                        toastHeader.querySelector('strong').textContent = 'Success';
+                    }
+
+                    const bsToast = new bootstrap.Toast(toast);
+                    bsToast.show();
+                }
+            }
+
+            formatDateForInput(date) {
+                if (!date) return '';
+                
+                // Use local timezone to avoid UTC offset issues
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                
+                return `${year}-${month}-${day}`;
+            }
+
+            handleBookingSubmit(e) {
+                e.preventDefault(); // Always prevent default form submission
+
+                if (this.isLoading) {
+                    return;
+                }
+
+                if (!this.selectedCheckIn || !this.selectedCheckOut) {
+                    this.showError('Please select check-in and check-out dates');
+                    return;
+                }
+
+                if (this.totalGuests > this.maxGuests) {
+                    this.showError(`This property can accommodate up to ${this.maxGuests} guests`);
+                    return;
+                }
+
+                this.setLoadingState(true);
+
+                // Update hidden form fields with selected dates and guests
+                document.getElementById('checkInInput').value = this.formatDateForInput(this.selectedCheckIn);
+                document.getElementById('checkOutInput').value = this.formatDateForInput(this.selectedCheckOut);
+                document.getElementById('guestsInput').value = this.totalGuests;
+
+                // Add additional hidden fields
+                const form = document.getElementById('bookingForm');
+
+                // Create or update hidden fields for adult count (use totalGuests as adults)
+                let adultsInput = document.getElementById('adultsInput');
+                if (!adultsInput) {
+                    adultsInput = document.createElement('input');
+                    adultsInput.type = 'hidden';
+                    adultsInput.id = 'adultsInput';
+                    adultsInput.name = 'adults';
+                    form.appendChild(adultsInput);
+                }
+                adultsInput.value = this.totalGuests;
+
+                // Create or update hidden fields for children count (default to 0)
+                let childrenInput = document.getElementById('childrenInput');
+                if (!childrenInput) {
+                    childrenInput = document.createElement('input');
+                    childrenInput.type = 'hidden';
+                    childrenInput.id = 'childrenInput';
+                    childrenInput.name = 'children';
+                    form.appendChild(childrenInput);
+                }
+                childrenInput.value = 0;
+
+                // Create or update hidden fields for infants count (default to 0)
+                let infantsInput = document.getElementById('infantsInput');
+                if (!infantsInput) {
+                    infantsInput = document.createElement('input');
+                    infantsInput.type = 'hidden';
+                    infantsInput.id = 'infantsInput';
+                    infantsInput.name = 'infants';
+                    form.appendChild(infantsInput);
+                }
+                infantsInput.value = 0;
+
+                // Store selected nights and calculated price to carry over to the book page
+                const nights = Math.ceil((this.selectedCheckOut - this.selectedCheckIn) / (1000 * 60 * 60 * 24));
+                const basePrice = this.listingPrice * nights;
+                const cleaningFee = Math.round(basePrice * 0.1); // 10% cleaning fee
+                const serviceFee = Math.round(basePrice * 0.14); // 14% service fee
+                const taxes = Math.round((basePrice + cleaningFee + serviceFee) * 0.12); // 12% taxes on subtotal
+                const totalPrice = basePrice + cleaningFee + serviceFee + taxes;
+
+                let nightsInput = document.getElementById('nightsInput');
+                if (!nightsInput) {
+                    nightsInput = document.createElement('input');
+                    nightsInput.type = 'hidden';
+                    nightsInput.id = 'nightsInput';
+                    nightsInput.name = 'nights';
+                    form.appendChild(nightsInput);
+                }
+                nightsInput.value = nights;
+
+                let basePriceInput = document.getElementById('basePriceInput');
+                if (!basePriceInput) {
+                    basePriceInput = document.createElement('input');
+                    basePriceInput.type = 'hidden';
+                    basePriceInput.id = 'basePriceInput';
+                    basePriceInput.name = 'basePrice';
+                    form.appendChild(basePriceInput);
+                }
+                basePriceInput.value = basePrice;
+
+                let serviceFeeInput = document.getElementById('serviceFeeInput');
+                if (!serviceFeeInput) {
+                    serviceFeeInput = document.createElement('input');
+                    serviceFeeInput.type = 'hidden';
+                    serviceFeeInput.id = 'serviceFeeInput';
+                    serviceFeeInput.name = 'serviceFee';
+                    form.appendChild(serviceFeeInput);
+                }
+                serviceFeeInput.value = serviceFee;
+
+                let taxesInput = document.getElementById('taxesInput');
+                if (!taxesInput) {
+                    taxesInput = document.createElement('input');
+                    taxesInput.type = 'hidden';
+                    taxesInput.id = 'taxesInput';
+                    taxesInput.name = 'taxes';
+                    form.appendChild(taxesInput);
+                }
+                taxesInput.value = taxes;
+
+                let totalPriceInput = document.getElementById('totalPriceInput');
+                if (!totalPriceInput) {
+                    totalPriceInput = document.createElement('input');
+                    totalPriceInput.type = 'hidden';
+                    totalPriceInput.id = 'totalPriceInput';
+                    totalPriceInput.name = 'totalPrice';
+                    form.appendChild(totalPriceInput);
+                }
+                totalPriceInput.value = totalPrice;
+
+                // Submit the form normally instead of redirecting directly
+                form.submit();
+            }
+        }
+
+        // Enhanced utility functions
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Link copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Link copied to clipboard!');
+            });
+        }
+
+        // Wishlist functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM Content Loaded');
+
+            // Initialize booking manager
+            window.bookingManager = new BookingManager();
+            console.log('BookingManager initialized');
+
+            // Immediately update guest counter buttons
+            if (window.bookingManager) {
+                console.log('Setting initial guest counter button states');
+                window.bookingManager.updateGuestCounterButtons();
+            }
+
+            // Initialize wishlist functionality
+            initializeWishlist();
+
+            // Form validation
+            const forms = document.querySelectorAll('.needs-validation');
+            forms.forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                });
+            });
+
+            // Enhanced interactions
+            addHoverEffects();
+            initializeScrollAnimations();
+            
+        });
+        
+        // Wishlist initialization function
+        function initializeWishlist() {
+            console.log('Initializing wishlist functionality');
+            const wishlistBtn = document.getElementById('wishlist-btn');
+            console.log('Wishlist button element:', wishlistBtn);
+            
+            if (wishlistBtn) {
+                console.log('Wishlist button found, attaching event listener');
+                
+                // Clear any existing event listeners
+                const newBtn = wishlistBtn.cloneNode(true);
+                wishlistBtn.parentNode.replaceChild(newBtn, wishlistBtn);
+                
+                // Add the event listener to the new button
+                newBtn.addEventListener('click', handleWishlistClick);
+                console.log('Event listener attached successfully');
+                
+                // Check initial wishlist status
+                console.log('Checking initial wishlist status');
+                setTimeout(() => checkWishlistStatus(), 100);
+            } else {
+                console.log('Wishlist button not found, retrying in 500ms');
+                setTimeout(initializeWishlist, 500);
+            }
+        }
+        
+        // Fallback initialization on window load
+        window.addEventListener('load', function() {
+            console.log('Window loaded, initializing wishlist if not already done');
+            // Small delay to ensure everything is loaded
+            setTimeout(initializeWishlist, 100);
+        });
+
+        // Separate function for handling wishlist click
+        async function handleWishlistClick(e) {
+            e.preventDefault();
+            console.log('Wishlist button clicked');
+            
+            const wishlistBtn = document.getElementById('wishlist-btn');
+            const listingId = wishlistBtn.dataset.listingId;
+            const icon = document.getElementById('wishlist-icon');
+            console.log('Listing ID:', listingId);
+
+            // Show loading state
+            const originalText = wishlistBtn.innerHTML;
+            wishlistBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+            wishlistBtn.disabled = true;
+
+            try {
+                const response = await fetch('/wishlist/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ listingId })
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success) {
+                    if (data.added) {
+                        icon.className = 'bi bi-heart-fill';
+                        wishlistBtn.classList.add('btn-danger');
+                        wishlistBtn.classList.remove('btn-outline-danger');
+                        wishlistBtn.innerHTML = '<i class="bi bi-heart-fill" id="wishlist-icon"></i> Saved';
+                        showToast('Added to wishlist!');
+                    } else {
+                        icon.className = 'bi bi-heart';
+                        wishlistBtn.classList.remove('btn-danger');
+                        wishlistBtn.classList.add('btn-outline-danger');
+                        wishlistBtn.innerHTML = '<i class="bi bi-heart" id="wishlist-icon"></i> Save';
+                        showToast('Removed from wishlist');
+                    }
+                } else {
+                    // Restore original button state
+                    wishlistBtn.innerHTML = originalText;
+                    showToast(data.message || 'Error updating wishlist', 'error');
+                }
+            } catch (error) {
+                console.error('Wishlist error:', error);
+                // Restore original button state
+                wishlistBtn.innerHTML = originalText;
+                showToast('Error updating wishlist', 'error');
+            } finally {
+                // Re-enable button
+                wishlistBtn.disabled = false;
+            }
+        }
+
+        async function checkWishlistStatus() {
+            console.log('Checking wishlist status');
+            const wishlistBtn = document.getElementById('wishlist-btn');
+            console.log('Wishlist button in checkWishlistStatus:', wishlistBtn);
+            if (!wishlistBtn) {
+                console.log('Wishlist button not found in checkWishlistStatus');
+                return;
+            }
+
+            // Get the listing ID from the button's data attribute
+            const listingId = wishlistBtn.dataset.listingId;
+            console.log('Listing ID for wishlist check:', listingId);
+            
+            try {
+                console.log('Making fetch request to check wishlist status');
+                const response = await fetch(`/wishlist/check/${listingId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                console.log('Wishlist check response status:', response.status);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Wishlist status check response:', data);
+
+                    if (data.isInWishlist) {
+                        console.log('Listing is in wishlist, updating UI');
+                        const icon = document.getElementById('wishlist-icon');
+                        icon.className = 'bi bi-heart-fill';
+                        wishlistBtn.classList.add('btn-danger');
+                        wishlistBtn.classList.remove('btn-outline-danger');
+                        // Update button text to indicate it's saved
+                        wishlistBtn.innerHTML = '<i class="bi bi-heart-fill" id="wishlist-icon"></i> Saved';
+                    } else {
+                        console.log('Listing is not in wishlist');
+                    }
+                } else {
+                    console.log('Wishlist check response not OK, status:', response.status);
+                }
+            } catch (error) {
+                console.error('Error checking wishlist status:', error);
+            }
+        }
+
+        function addHoverEffects() {
+            // Add subtle animations to interactive elements
+            const interactiveElements = document.querySelectorAll('.btn, .card, .calendar-day');
+
+            interactiveElements.forEach(element => {
+                element.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+
+                element.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        }
+
+        function initializeScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe sections for scroll animations
+            const sections = document.querySelectorAll('.py-4, .enhanced-booking-card');
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        }
+
+        // Add fade-in animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+`;
+        document.head.appendChild(style);
+
+        function showToast(message, type = 'success') {
+            if (window.bookingManager && window.bookingManager.showToast) {
+                window.bookingManager.showToast(message, type);
+            } else {
+                // Fallback toast notification
+                console.log(`Toast: ${message} (${type})`);
+                
+                // Create a simple toast if bootstrap toast exists
+                const toastContainer = document.querySelector('.toast-container') || document.body;
+                const toastElement = document.createElement('div');
+                toastElement.className = `alert alert-${type === 'error' ? 'danger' : 'success'} alert-dismissible fade show position-fixed`;
+                toastElement.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                toastElement.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                toastContainer.appendChild(toastElement);
+                
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    if (toastElement.parentNode) {
+                        toastElement.parentNode.removeChild(toastElement);
+                    }
+                }, 3000);
+            }
+        }
+
+        // Image Modal Functions
+        function openImageModal(index, type) {
+            console.log('Opening image modal with index:', index, 'type:', type);
+            const imageModal = document.getElementById('imageModal');
+
+            if (!imageModal) {
+                console.error('Error: Image modal element not found');
+                alert('Error loading image gallery. Please try again.');
+                return;
+            }
+
+            // Collect all images
+            let images = [];
+
+            // Add main image if it exists
+            <% if (listdata.image && listdata.image.url) { %>
+                images.push({
+                    url: '<%= listdata.image.url %>',
+                    title: 'Main Image',
+                    alt: '<%= listdata.title %>'
+                });
+                console.log('Added main image to gallery');
+            <% } %>
+
+            // Add all additional images if they exist
+            <% if (listdata.additionalImages && listdata.additionalImages.length > 0) { %>
+                <% listdata.additionalImages.forEach((img, i) => { %>
+                    images.push({
+                        url: '<%= img.url %>',
+                        title: 'Additional Image <%= i + 1 %>',
+                        alt: 'Additional image <%= i + 1 %>'
+                    });
+                <% }) %>
+                console.log('Added <%= listdata.additionalImages.length %> additional images to gallery');
+            <% } %>
+
+            // Check if we have any images to display
+            if (images.length === 0) {
+                console.error('Error: No images found to display');
+                alert('No images available to display.');
+                return;
+            }
+
+            // Determine which image to show first
+            let startIndex = 0;
+            if (type === 'main') {
+                startIndex = 0;
+            } else if (type === 'additional' && index >= 0) {
+                // For additional images, we need to add 1 to account for the main image
+                startIndex = index + 1;
+                // Make sure we don't exceed the array bounds
+                if (startIndex >= images.length) {
+                    startIndex = 0;
+                }
+            } else if (type === 'all' && index >= 0) {
+                startIndex = index;
+                if (startIndex >= images.length) {
+                    startIndex = 0;
+                }
+            }
+
+            // Store images and current index in window for navigation functions
+            window.galleryImages = images;
+            window.currentImageIndex = startIndex;
+
+            console.log(`Gallery has ${images.length} total images, starting at index ${startIndex}`);
+
+            // Update the modal with the first image
+            updateModalImage();
+
+            // Update total image count in the title
+            document.getElementById('imageTotal').textContent = images.length;
+
+            // Show the modal
+            try {
+                const modal = new bootstrap.Modal(imageModal);
+                modal.show();
+                console.log('Modal opened successfully');
+            } catch (error) {
+                console.error('Error opening modal:', error);
+                alert('Error displaying image gallery. Please try again.');
+            }
+        }
+
+        function openAllImagesModal() {
+            console.log('View all photos button clicked');
+            openImageModal(0, 'all');
+        }
+
+        function updateModalImage() {
+            console.log('Updating modal image, current index:', window.currentImageIndex);
+
+            if (!window.galleryImages || !Array.isArray(window.galleryImages) || window.galleryImages.length === 0) {
+                console.error('Error: No gallery images available');
+                return;
+            }
+
+            const modalImage = document.getElementById('modalImage');
+            const imageCounter = document.getElementById('imageCounter');
+            const imagePosition = document.getElementById('imagePosition');
+
+            if (!modalImage || !imageCounter || !imagePosition) {
+                console.error('Error: Modal elements not found');
+                return;
+            }
+
+            // Make sure the index is valid
+            if (window.currentImageIndex < 0 || window.currentImageIndex >= window.galleryImages.length) {
+                console.error('Invalid image index:', window.currentImageIndex);
+                window.currentImageIndex = 0;
+            }
+
+            // Get the current image
+            const currentImage = window.galleryImages[window.currentImageIndex];
+
+            // Update the image and counter
+            modalImage.src = currentImage.url;
+            modalImage.alt = currentImage.alt || currentImage.title || 'Property image';
+            imageCounter.textContent = `${window.currentImageIndex + 1} / ${window.galleryImages.length}`;
+            imagePosition.textContent = window.currentImageIndex + 1;
+
+            console.log(`Displayed image ${window.currentImageIndex + 1} of ${window.galleryImages.length}`);
+        }
+
+        function previousImage() {
+            console.log('Previous image button clicked');
+
+            if (!window.galleryImages || !Array.isArray(window.galleryImages) || window.galleryImages.length === 0) {
+                console.error('Error: No gallery images available');
+                return;
+            }
+
+            // Decrement the index, wrapping around to the end if necessary
+            window.currentImageIndex = (window.currentImageIndex - 1 + window.galleryImages.length) % window.galleryImages.length;
+
+            console.log('New image index:', window.currentImageIndex);
+
+            // Update the modal with the new image
+            updateModalImage();
+        }
+
+        function nextImage() {
+            console.log('Next image button clicked');
+
+            if (!window.galleryImages || !Array.isArray(window.galleryImages) || window.galleryImages.length === 0) {
+                console.error('Error: No gallery images available');
+                return;
+            }
+
+            // Increment the index, wrapping around to the beginning if necessary
+            window.currentImageIndex = (window.currentImageIndex + 1) % window.galleryImages.length;
+
+            console.log('New image index:', window.currentImageIndex);
+
+            // Update the modal with the new image
+            updateModalImage();
+        }
+    </script>
+
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true" style="z-index: 10000;">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-white" id="imageModalLabel">
+                        <%= listdata.title %> - Photos (<span id="imagePosition">1</span>/<span
+                                id="imageTotal">1</span>)
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-0 position-relative">
+                    <img id="modalImage" class="img-fluid" style="max-height: 80vh; object-fit: contain;"
+                        alt="Property Image">
+
+                    <!-- Navigation buttons with larger clickable area and improved visibility -->
+                    <div class="position-absolute top-50 start-0 translate-middle-y"
+                        style="width: 120px; height: 120px; cursor: pointer; z-index: 1050;" onclick="previousImage()">
+                        <div class="bg-dark bg-opacity-75 rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 70px; height: 70px; margin-left: 25px; transition: all 0.2s ease; box-shadow: 0 0 15px rgba(255,255,255,0.2);">
+                            <i class="bi bi-chevron-left text-white fs-1" style="font-size: 2.5rem !important;"></i>
+                        </div>
+                    </div>
+
+                    <div class="position-absolute top-50 end-0 translate-middle-y"
+                        style="width: 120px; height: 120px; cursor: pointer; z-index: 1050;" onclick="nextImage()">
+                        <div class="bg-dark bg-opacity-75 rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 70px; height: 70px; margin-right: 25px; transition: all 0.2s ease; box-shadow: 0 0 15px rgba(255,255,255,0.2);">
+                            <i class="bi bi-chevron-right text-white fs-1" style="font-size: 2.5rem !important;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Image counter with improved visibility -->
+                    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-4">
+                        <span id="imageCounter" class="badge bg-dark bg-opacity-75 fs-6 px-4 py-2 rounded-pill">1 /
+                            1</span>
+                    </div>
+                </div>
+                <div class="modal-footer bg-dark border-0">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Amenities Modal -->
+    <div class="modal fade" id="amenitiesModal" tabindex="-1" aria-labelledby="amenitiesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="amenitiesModalLabel">
+                        <i class="bi bi-list-check"></i> All Amenities
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <% if(listdata.amenities && listdata.amenities.length > 0) { %>
+                            <% listdata.amenities.forEach(amenity => { %>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <span><%= amenity %></span>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="col-12">
+                                <p class="text-center text-muted">No amenities listed</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add style for navigation buttons -->
+    <style>
+        /* Modal z-index fix to prevent navbar overlap */
+        .modal-backdrop {
+            z-index: 9999 !important;
+        }
+        
+        #imageModal {
+            z-index: 10000 !important;
+        }
+        
+        #imageModal .modal-dialog {
+            margin: 0;
+            max-width: 100%;
+            height: 100%;
+        }
+        
+        #imageModal .modal-content {
+            height: 100%;
+            border: none;
+            border-radius: 0;
+        }
+        
+        /* Hide navbar when modal is shown */
+        body.modal-open .navbar {
+            z-index: 1 !important;
+        }
+        
+        /* Navigation button hover effects */
+        .modal-body>div[onclick]>div:hover {
+            transform: scale(1.15);
+            background-color: rgba(0, 0, 0, 0.9) !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3) !important;
+        }
+
+        /* Make sure navigation arrows are clearly visible */
+        .bi-chevron-left,
+        .bi-chevron-right {
+            filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.8));
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Ensure the navigation buttons are visible on all background colors */
+        @media (max-width: 768px) {
+            .modal-body>div[onclick] {
+                width: 100px !important;
+                height: 100px !important;
+            }
+
+            .modal-body>div[onclick]>div {
+                width: 60px !important;
+                height: 60px !important;
+            }
+
+            .bi-chevron-left,
+            .bi-chevron-right {
+                font-size: 2rem !important;
+            }
+        }
+
+        /* Additional enhancement for better visibility */
+        #imageModal .position-absolute {
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+
+        #imageModal .position-absolute:hover {
+            opacity: 1;
+        }
+    </style>
+
+    <!-- Ensure Bootstrap JS is properly loaded -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+
+    <script>
+        // Global variables for image gallery
+        let galleryImages = [];
+        let currentImageIndex = 0;
+
+        // Document ready function
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Document ready - setting up image gallery functionality');
+            prepareGalleryImages();
+        });
+
+        // Prepare gallery images data
+        function prepareGalleryImages() {
+            galleryImages = [];
+
+            // Add main image if it exists
+            <% if (listdata.image && listdata.image.url) { %>
+                galleryImages.push({
+                    url: '<%= listdata.image.url %>',
+                    title: 'Main Image',
+                    alt: '<%= listdata.title %>'
+                });
+                console.log('Added main image to gallery data');
+            <% } %>
+
+            // Add all additional images if they exist
+            <% if (listdata.additionalImages && listdata.additionalImages.length > 0) { %>
+                <% listdata.additionalImages.forEach((img, i) => { %>
+                    galleryImages.push({
+                        url: '<%= img.url %>',
+                        title: 'Additional Image <%= i + 1 %>',
+                        alt: 'Additional image <%= i + 1 %>'
+                    });
+                <% }) %>
+                console.log('Added <%= listdata.additionalImages.length %> additional images to gallery data');
+            <% } %>
+
+                console.log('Gallery prepared with ' + galleryImages.length + ' total images');
+        }
+
+        // Function to open the image modal
+        function openImageModal(index, type) {
+            console.log('Opening image modal with index:', index, 'type:', type);
+
+            // Make sure we have the gallery data
+            if (galleryImages.length === 0) {
+                prepareGalleryImages();
+            }
+
+            if (galleryImages.length === 0) {
+                console.error('No images available to display');
+                alert('No images available to display');
+                return;
+            }
+
+            // Get the modal element
+            const imageModal = document.getElementById('imageModal');
+            if (!imageModal) {
+                console.error('Image modal element not found');
+                alert('Error displaying images. Please try again.');
+                return;
+            }
+
+            // Determine the starting index based on the type
+            if (type === 'main') {
+                currentImageIndex = 0;
+            } else if (type === 'additional' && index >= 0) {
+                // For additional images, add 1 to account for the main image
+                currentImageIndex = index + 1;
+                // Make sure we don't exceed the array bounds
+                if (currentImageIndex >= galleryImages.length) {
+                    currentImageIndex = 0;
+                }
+            } else if (type === 'all' && index >= 0) {
+                currentImageIndex = index;
+                if (currentImageIndex >= galleryImages.length) {
+                    currentImageIndex = 0;
+                }
+            } else {
+                currentImageIndex = 0;
+            }
+
+            console.log('Starting at image index:', currentImageIndex);
+
+            // Update the modal with the starting image
+            updateModalImage();
+
+            // Update total image count in the title
+            document.getElementById('imageTotal').textContent = galleryImages.length;
+
+            // Show the modal
+            try {
+                const modal = new bootstrap.Modal(imageModal);
+                modal.show();
+                console.log('Modal opened successfully');
+            } catch (error) {
+                console.error('Error opening modal:', error);
+                alert('Error displaying image gallery. Please try again.');
+            }
+        }
+
+        // Function to open the all images modal
+        function openAllImagesModal() {
+            console.log('View all photos button clicked');
+            openImageModal(0, 'all');
+        }
+
+        // Function to update the modal image
+        function updateModalImage() {
+            console.log('Updating modal image to index:', currentImageIndex);
+
+            if (!galleryImages || galleryImages.length === 0) {
+                console.error('No gallery images available');
+                return;
+            }
+
+            // Get the elements
+            const modalImage = document.getElementById('modalImage');
+            const imageCounter = document.getElementById('imageCounter');
+            const imagePosition = document.getElementById('imagePosition');
+
+            if (!modalImage || !imageCounter || !imagePosition) {
+                console.error('Modal elements not found');
+                return;
+            }
+
+            // Make sure the index is valid
+            if (currentImageIndex < 0 || currentImageIndex >= galleryImages.length) {
+                console.error('Invalid image index:', currentImageIndex);
+                currentImageIndex = 0;
+            }
+
+            // Get the current image
+            const currentImage = galleryImages[currentImageIndex];
+
+            // Update the image
+            modalImage.src = currentImage.url;
+            modalImage.alt = currentImage.alt || currentImage.title || 'Property image';
+
+            // Update the counters
+            imageCounter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
+            imagePosition.textContent = currentImageIndex + 1;
+
+            console.log('Displayed image', currentImageIndex + 1, 'of', galleryImages.length);
+        }
+
+        // Function to navigate to the previous image
+        function previousImage() {
+            console.log('Previous image button clicked');
+
+            if (!galleryImages || galleryImages.length === 0) {
+                console.error('No gallery images available');
+                return;
+            }
+
+            // Decrement the index, wrapping around to the end if necessary
+            currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+            console.log('New image index:', currentImageIndex);
+
+            // Update the modal with the new image
+            updateModalImage();
+        }
+
+        // Function to navigate to the next image
+        function nextImage() {
+            console.log('Next image button clicked');
+
+            if (!galleryImages || galleryImages.length === 0) {
+                console.error('No gallery images available');
+                return;
+            }
+
+            // Increment the index, wrapping around to the beginning if necessary
+            currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+            console.log('New image index:', currentImageIndex);
+
+            // Update the modal with the new image
+            updateModalImage();
+        }
+
+        // Add keyboard navigation for the modal
+        document.addEventListener('keydown', function (event) {
+            const imageModal = document.getElementById('imageModal');
+            if (imageModal && imageModal.classList.contains('show')) {
+                if (event.key === 'ArrowLeft') {
+                    previousImage();
+                } else if (event.key === 'ArrowRight') {
+                    nextImage();
+                } else if (event.key === 'Escape') {
+                    const modal = bootstrap.Modal.getInstance(imageModal);
+                    if (modal) {
+                        modal.hide();
+                    }
+                }
+            }
+        });
+
+        // Function to show all amenities
+        function showAllAmenities() {
+            console.log('Show all amenities button clicked');
+            const amenitiesModal = document.getElementById('amenitiesModal');
+            if (!amenitiesModal) {
+                console.error('Amenities modal element not found');
+                alert('Error displaying amenities. Please try again.');
+                return;
+            }
+
+            try {
+                const modal = new bootstrap.Modal(amenitiesModal);
+                modal.show();
+                console.log('Amenities modal opened successfully');
+            } catch (error) {
+                console.error('Error opening amenities modal:', error);
+                alert('Error displaying amenities. Please try again.');
+            }
+        }
+    </script>
+    
+    <script src="/js/reviews-enhanced.js"></script>
+
+    </html>

@@ -1,0 +1,95 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+    
+    .login-wrapper {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        border-top: 4px solid #ff385c;
+    }
+
+    h1 {
+        color: #ff385c;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .form-label {
+        color: #333;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ff385c;
+        box-shadow: 0 0 0 3px rgba(255, 56, 92, 0.1);
+    }
+
+    .btn-custom {
+        background-color: #ff385c;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        padding: 0.75rem 2rem;
+        width: 100%;
+        transition: background-color 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-custom:hover {
+        background-color: #d63384;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .login-wrapper {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="row mt-3">
+    <div class="col-6 offset-3">
+        <div class="login-wrapper">
+            <h1 class="mb-4">Login</h1>
+            
+            <form action="/login" method="post" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" 
+                           name="username" 
+                           id="username" 
+                           placeholder="Enter username" 
+                           class="form-control"
+                           required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" 
+                           name="password" 
+                           id="password" 
+                           placeholder="Enter password"
+                           class="form-control" 
+                           required>
+                </div>
+                
+                <button type="submit" class="btn btn-custom">Login</button>
+            </form>
+        </div>
+    </div>
+</div>

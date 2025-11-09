@@ -1,0 +1,716 @@
+<style>
+  /* Enhanced Navbar Styles */
+  
+  /* Navbar brand alignment */
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #222222;
+    transition: all 0.3s ease;
+  }
+
+  .navbar-brand:hover {
+    color: #ff385c;
+    transform: translateY(-2px);
+  }
+
+  .navbar-brand i {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+  }
+
+  .navbar-brand:hover i {
+    transform: scale(1.1) rotate(-5deg);
+  }
+
+  /* Search bar container for alignment */
+  .search-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+    flex: 0 1 auto;
+    margin: 0 1rem;
+  }
+
+  /* Enhanced Search input */
+  .search-container .form-control {
+    border-radius: 30px 0 0 30px;
+    padding: 0.75rem 1.25rem;
+    border: 2px solid #e9ecef;
+    border-right: none;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .search-container .form-control:focus {
+    border-color: #ff385c;
+    box-shadow: 0 4px 12px rgba(255, 56, 92, 0.15);
+    background: #fff;
+  }
+
+  .search-container .form-control::placeholder {
+    color: #adb5bd;
+  }
+
+  /* Enhanced Search button */
+  .btn-search {
+    background: linear-gradient(135deg, #ff385c 0%, #e31c5f 100%);
+    color: white;
+    border-radius: 0 30px 30px 0;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #ff385c;
+    border-left: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(255, 56, 92, 0.2);
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .btn-search:hover {
+    background: linear-gradient(135deg, #e31c5f 0%, #c91a4a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255, 56, 92, 0.3);
+  }
+
+  .btn-search:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 56, 92, 0.2);
+  }
+
+  .btn-search:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(255, 56, 92, 0.25), 0 4px 16px rgba(255, 56, 92, 0.3);
+  }
+
+  /* Icon inside button */
+  .btn-search i {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  .btn-search:hover i {
+    transform: scale(1.1);
+  }
+
+  /* Enhanced Sign-in and Sign-up Buttons */
+  .nav-auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .btn-signin,
+  .btn-signup {
+    padding: 0.6rem 1.25rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .btn-signin {
+    background: #ffffff;
+    color: #222222;
+    border-color: #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .btn-signin:hover {
+    background: #f8f9fa;
+    border-color: #ff385c;
+    color: #ff385c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 56, 92, 0.15);
+  }
+
+  .btn-signup {
+    background: linear-gradient(135deg, #ff385c 0%, #e31c5f 100%);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(255, 56, 92, 0.2);
+  }
+
+  .btn-signup:hover {
+    background: linear-gradient(135deg, #e31c5f 0%, #c91a4a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255, 56, 92, 0.3);
+    color: #ffffff;
+  }
+
+  .btn-signin:active,
+  .btn-signup:active {
+    transform: translateY(0);
+  }
+
+  .btn-signin:focus,
+  .btn-signup:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(255, 56, 92, 0.25);
+  }
+
+  /* Enhanced Profile Dropdown */
+  .nav-item.dropdown {
+    position: relative;
+  }
+
+  .nav-link.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    color: #222222;
+    font-weight: 500;
+    text-decoration: none;
+    border: 2px solid transparent;
+  }
+
+  .nav-link.dropdown-toggle:hover {
+    background: #f8f9fa;
+    border-color: #ff385c;
+    color: #ff385c;
+  }
+
+  .nav-link.dropdown-toggle img {
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+  }
+
+  .nav-link.dropdown-toggle:hover img {
+    border-color: #ff385c;
+    box-shadow: 0 2px 8px rgba(255, 56, 92, 0.2);
+  }
+
+  .nav-link.dropdown-toggle i {
+    font-size: 1.5rem;
+    color: #ff385c;
+  }
+
+  .nav-link.dropdown-toggle .bi-chevron-down {
+    transition: transform 0.3s ease;
+  }
+
+  .nav-link.dropdown-toggle.active .bi-chevron-down,
+  .dropdown-menu.show ~ .nav-link.dropdown-toggle .bi-chevron-down {
+    transform: rotate(180deg);
+  }
+
+  /* Enhanced Dropdown Menu */
+  .dropdown-menu {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+    min-width: 240px;
+    animation: dropdownFadeIn 0.3s ease;
+    z-index: 10000;
+    position: absolute;
+    background: #ffffff;
+  }
+
+  @keyframes dropdownFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .dropdown-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    padding: 0.75rem 1rem 0.5rem;
+  }
+
+  .dropdown-item {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: #222222;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+  }
+
+  .dropdown-item i {
+    width: 20px;
+    text-align: center;
+    color: #6c757d;
+    transition: all 0.2s ease;
+  }
+
+  .dropdown-item:hover {
+    background: linear-gradient(135deg, #fff5f6 0%, #ffeef0 100%);
+    color: #ff385c;
+    padding-left: 1.25rem;
+  }
+
+  .dropdown-item:hover i {
+    color: #ff385c;
+    transform: scale(1.1);
+  }
+
+  .dropdown-divider {
+    margin: 0.5rem 0;
+    border-color: #e9ecef;
+  }
+
+  /* Enhanced Nav Links */
+  .navbar-nav .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #222222;
+    position: relative;
+  }
+
+  .navbar-nav .nav-link:hover {
+    color: #ff385c;
+    background: #f8f9fa;
+    transform: translateY(-2px);
+  }
+
+  .navbar-nav .nav-link:focus {
+    color: #ff385c;
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(255, 56, 92, 0.15);
+  }
+
+  .navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: #ff385c;
+    transition: width 0.3s ease;
+  }
+
+  .navbar-nav .nav-link:hover::after {
+    width: 60%;
+  }
+
+  /* Navbar Container Enhancement */
+  .navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+    z-index: 1030;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+  }
+
+  /* Navbar container-fluid spacing */
+  .navbar .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Ensure proper spacing in navbar */
+  .navbar-nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Navbar Toggler Enhancement */
+  .navbar-toggler {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+    transition: all 0.3s ease;
+  }
+
+  .navbar-toggler:hover {
+    border-color: #ff385c;
+    background: #f8f9fa;
+  }
+
+  .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 56, 92, 0.25);
+  }
+
+  /* Mobile Hamburger Menu Dropdown - Make it white */
+  @media (max-width: 768px) {
+    .navbar-collapse {
+      background-color: #ffffff !important;
+      border-radius: 12px;
+      margin-top: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-collapse.show {
+      background-color: #ffffff !important;
+      opacity: 1 !important;
+    }
+
+    .navbar-brand {
+      font-size: 1.25rem;
+    }
+
+    .navbar-brand i {
+      font-size: 1.8rem;
+    }
+
+    .search-container {
+      max-width: 100%;
+      margin: 0.5rem 0;
+      order: 3;
+      width: 100%;
+    }
+
+    .nav-auth-buttons {
+      flex-direction: column;
+      width: 100%;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-signin,
+    .btn-signup {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .dropdown-menu {
+      min-width: 100%;
+      margin-top: 0.5rem;
+      background-color: #ffffff !important;
+    }
+
+    .nav-link.dropdown-toggle {
+      width: 100%;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .navbar-nav {
+      width: 100%;
+      background-color: transparent !important;
+    }
+
+    .navbar-nav .nav-link {
+      text-align: center;
+      margin: 0.25rem 0;
+      background-color: transparent !important;
+    }
+
+    /* Ensure all navbar content is visible on white background */
+    .navbar-nav .nav-link,
+    .navbar-nav .dropdown-menu,
+    .navbar-nav .dropdown-item {
+      color: #222222 !important;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .search-container .form-control {
+      font-size: 0.875rem;
+      padding: 0.6rem 1rem;
+    }
+
+    .btn-search {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.875rem;
+    }
+
+    .btn-signin,
+    .btn-signup {
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+    }
+  }
+
+  /* Desktop view - ensure proper layout */
+  @media (min-width: 768px) {
+    .navbar-collapse {
+      display: flex !important;
+      flex-basis: auto !important;
+      flex-grow: 1;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin-top: 0;
+      padding: 0;
+    }
+
+    .navbar-nav.me-auto {
+      margin-right: auto;
+      margin-left: 0;
+      flex-shrink: 0;
+    }
+
+    .search-container {
+      flex: 0 1 auto;
+      margin: 0 1.5rem;
+      min-width: 280px;
+      max-width: 380px;
+    }
+
+    .navbar-nav:last-child {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+  }
+
+  /* Large desktop - adjust search width */
+  @media (min-width: 992px) {
+    .search-container {
+      max-width: 420px;
+      min-width: 320px;
+    }
+  }
+
+  /* Extra large desktop - slightly wider search */
+  @media (min-width: 1200px) {
+    .search-container {
+      max-width: 450px;
+      min-width: 350px;
+    }
+  }
+</style>
+<nav class="navbar navbar-expand-md bg-body-tertiary border-bottom sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/listings"><i class="bi bi-backpack" style="color: #ff385c; font-size: 2.2rem;"></i>
+      HomyStay</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav me-auto">
+        <a class="nav-link" href="/listings">Explore</a>
+      </div>
+      <form class="search-container" action="/listings/search" method="GET">
+        <input class="form-control" type="search" name="q" placeholder="Search by location or hotel"
+          aria-label="Search" />
+        <button class="btn-search" type="submit">
+          <i class="fa-solid fa-magnifying-glass"></i> Search
+        </button>
+      </form>
+      <div class="navbar-nav">
+        <% if(currUser){ %>
+
+
+          <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" onclick="toggleDropdown(event)" id="userDropdown">
+              <% if(currUser.profile && currUser.profile.profilePicture) { %>
+                <img src="<%= currUser.profile.profilePicture.url %>" class="rounded-circle" width="32" height="32"
+                  alt="Profile" style="object-fit: cover;">
+                <% } else { %>
+                  <i class="bi bi-person-circle"></i>
+                  <% } %>
+                    <span><%= currUser.username %></span>
+                    <i class="bi bi-chevron-down" style="font-size: 0.75rem; margin-left: 0.25rem;"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <h6 class="dropdown-header">Dashboard</h6>
+              </li>
+              <li><a class="dropdown-item" href="/profile/dashboard/guest?type=guest">
+                  <i class="bi bi-person"></i> Guest Dashboard
+                </a></li>
+              <li><a class="dropdown-item" href="/profile/dashboard/host?type=host">
+                  <i class="bi bi-house"></i> Host Dashboard
+                </a></li>
+              <% if(currUser && currUser.isAdmin === true) { %>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="/admin/dashboard">
+                    <i class="bi bi-shield-check"></i> Admin Dashboard
+                  </a></li>
+              <% } %>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li>
+                <h6 class="dropdown-header">Account</h6>
+              </li>
+              <li><a class="dropdown-item" href="/profile/<%= currUser._id %>">
+                  <i class="bi bi-person"></i> View Profile
+                </a></li>
+              <li><a class="dropdown-item" href="/profile/<%= currUser._id %>/edit">
+                  <i class="bi bi-pencil"></i> Edit Profile
+                </a></li>
+              <li><a class="dropdown-item" href="/bookings/my-bookings">
+                  <i class="bi bi-calendar3"></i> My Bookings
+                </a></li>
+              <li><a class="dropdown-item" href="/bookings/host-bookings">
+                  <i class="bi bi-calendar-check"></i> Host Bookings
+                </a></li>
+              <li><a class="dropdown-item" href="/wishlist">
+                  <i class="bi bi-heart"></i> Wishlist
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="/listings/new">
+                  <i class="bi bi-plus-circle"></i> Add new Listing
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li>
+                <form action="/logout" method="POST" id="logout-form" style="display: inline;">
+                  <button type="submit" class="dropdown-item" onclick="console.log('Logout button clicked')"
+                    style="cursor: pointer;">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </div>
+          <% } else { %>
+            <div class="nav-auth-buttons">
+              <a class="btn-signin" href="/login">
+                <i class="bi bi-box-arrow-in-right"></i> Sign In
+              </a>
+              <a class="btn-signup" href="/signup">
+                <i class="bi bi-person-plus"></i> Sign Up
+              </a>
+            </div>
+            <% } %>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Direct JavaScript for navbar dropdown -->
+<script>
+  // Function to ensure dropdown stays within viewport
+  function ensureDropdownInViewport(dropdown) {
+    if (!dropdown) return;
+
+    // Get dropdown dimensions and position
+    const rect = dropdown.getBoundingClientRect();
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    // Check if dropdown extends beyond right edge of viewport
+    if (rect.right > viewportWidth) {
+      console.log('Fixing dropdown position - outside right edge');
+      dropdown.style.right = '0';
+      dropdown.style.left = 'auto';
+    }
+
+    // Check if dropdown extends beyond bottom of viewport
+    if (rect.bottom > viewportHeight) {
+      console.log('Fixing dropdown height - outside bottom edge');
+      const maxHeight = viewportHeight - rect.top - 20; // 20px buffer
+      dropdown.style.maxHeight = maxHeight + 'px';
+      dropdown.style.overflowY = 'auto';
+    }
+  }
+
+  // Function to toggle dropdown menu
+  function toggleDropdown(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Find the dropdown menu and toggle button
+    var dropdown = event.currentTarget.nextElementSibling;
+    var toggle = event.currentTarget;
+
+    // Toggle the 'show' class to display/hide the dropdown
+    if (dropdown.classList.contains('show')) {
+      dropdown.classList.remove('show');
+      toggle.classList.remove('active');
+    } else {
+      // Close any other open dropdowns first
+      document.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
+        menu.classList.remove('show');
+      });
+      document.querySelectorAll('.nav-link.dropdown-toggle.active').forEach(function (btn) {
+        btn.classList.remove('active');
+      });
+
+      dropdown.classList.add('show');
+      toggle.classList.add('active');
+
+      // Ensure dropdown stays within viewport boundaries
+      ensureDropdownInViewport(dropdown);
+    }
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (event) {
+    if (!event.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
+        menu.classList.remove('show');
+      });
+      document.querySelectorAll('.nav-link.dropdown-toggle.active').forEach(function (btn) {
+        btn.classList.remove('active');
+      });
+    }
+  });
+
+  // Ensure logout form works properly
+  document.addEventListener('DOMContentLoaded', function () {
+    const logoutForm = document.getElementById('logout-form');
+    if (logoutForm) {
+      // Add submit event listener
+      logoutForm.addEventListener('submit', function (e) {
+        // Let the form submit naturally
+      });
+    }
+
+    // Apply viewport checks to any open dropdowns
+    document.querySelectorAll('.dropdown-toggle').forEach(function (toggle) {
+      toggle.addEventListener('click', function () {
+        setTimeout(function () {
+          const dropdown = toggle.nextElementSibling;
+          if (dropdown && dropdown.classList.contains('show')) {
+            ensureDropdownInViewport(dropdown);
+          }
+        }, 0);
+      });
+    });
+  });
+</script>

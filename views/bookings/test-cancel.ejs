@@ -1,0 +1,62 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Booking Cancellation Test</h3>
+                </div>
+                <div class="card-body">
+                    <p>This page is for testing booking cancellation functionality.</p>
+                    
+                    <form id="testForm">
+                        <div class="mb-3">
+                            <label for="bookingId" class="form-label">Booking ID</label>
+                            <input type="text" class="form-control" id="bookingId" placeholder="Enter booking ID">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Test Cancellation</button>
+                    </form>
+                    
+                    <div id="result" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('testForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const bookingId = document.getElementById('bookingId').value;
+    const resultDiv = document.getElementById('result');
+    
+    if (!bookingId) {
+        resultDiv.innerHTML = '<div class="alert alert-danger">Please enter a booking ID</div>';
+        return;
+    }
+    
+    try {
+        resultDiv.innerHTML = '<div class="alert alert-info">Testing cancellation...</div>';
+        
+        const response = await fetch(`/bookings/test-cancel/${bookingId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            resultDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+        } else {
+            resultDiv.innerHTML = `<div class="alert alert-danger">${data.message || data.error}</div>`;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+    }
+});
+</script>

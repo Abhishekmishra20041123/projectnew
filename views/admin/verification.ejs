@@ -1,0 +1,187 @@
+<% layout("layouts/boilerplate") %>
+
+<style>
+    .verification-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-info-card {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .document-preview {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .document-preview iframe {
+        width: 100%;
+        height: 600px;
+        border: none;
+        border-radius: 8px;
+    }
+
+    .btn-approve {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+
+    .btn-reject {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+
+    .info-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #667eea;
+        margin-right: 1rem;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="verification-header">
+        <h1 class="mb-2"><i class="bi bi-shield-check"></i> Identity Verification Review</h1>
+        <p class="mb-0">Review user identity document and verify</p>
+    </div>
+
+    <!-- User Information -->
+    <div class="user-info-card">
+        <h5 class="mb-3"><i class="bi bi-person"></i> User Information</h5>
+        <div class="info-item">
+            <span class="info-label">Username:</span>
+            <span><%= user.username %></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span><%= user.email %></span>
+        </div>
+        <% if(user.profile.firstName || user.profile.lastName) { %>
+            <div class="info-item">
+                <span class="info-label">Name:</span>
+                <span><%= user.profile.firstName %> <%= user.profile.lastName %></span>
+            </div>
+        <% } %>
+        <% if(user.profile.phone) { %>
+            <div class="info-item">
+                <span class="info-label">Phone:</span>
+                <span><%= user.profile.phone %></span>
+            </div>
+        <% } %>
+        <div class="info-item">
+            <span class="info-label">Verification Status:</span>
+            <span class="badge <%= user.profile.verified.identity ? 'bg-success' : 'bg-warning' %>">
+                <%= user.profile.verified.identity ? 'Verified' : 'Pending' %>
+            </span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Document Uploaded:</span>
+            <span><%= user.profile.identityDocument ? 'Yes' : 'No' %></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Account Created:</span>
+            <span><%= new Date(user.createdAt).toLocaleDateString() %></span>
+        </div>
+    </div>
+
+    <!-- Document Preview -->
+    <% if(user.profile.identityDocument && user.profile.identityDocument.url) { %>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-3"><i class="bi bi-file-earmark"></i> Identity Document</h5>
+                <div class="document-preview">
+                    <% if(user.profile.identityDocument.url.match(/\.pdf$/i)) { %>
+                        <iframe src="<%= user.profile.identityDocument.url %>" type="application/pdf">
+                            <p>Your browser does not support PDFs. 
+                                <a href="<%= user.profile.identityDocument.url %>" target="_blank">Download the PDF</a>.
+                            </p>
+                        </iframe>
+                    <% } else { %>
+                        <img src="<%= user.profile.identityDocument.url %>" alt="Identity Document" 
+                             style="max-width: 100%; max-height: 600px; border-radius: 8px;">
+                    <% } %>
+                </div>
+                <div class="text-center">
+                    <a href="/admin/document/<%= user._id %>" target="_blank" class="btn btn-primary">
+                        <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                    </a>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> No identity document uploaded by this user.
+        </div>
+    <% } %>
+
+    <!-- Action Buttons -->
+    <% if(user.profile.identityDocument && user.profile.identityDocument.url && !user.profile.verified.identity) { %>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-3"><i class="bi bi-check-circle"></i> Verification Actions</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <form action="/admin/verification/<%= user._id %>/approve" method="POST">
+                            <button type="submit" class="btn btn-approve w-100" 
+                                    onclick="return confirm('Approve identity verification for <%= user.username %>?')">
+                                <i class="bi bi-check-circle"></i> Approve Verification
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <form action="/admin/verification/<%= user._id %>/reject" method="POST">
+                            <div class="mb-2">
+                                <label for="rejectionReason" class="form-label">Rejection Reason (Optional)</label>
+                                <textarea class="form-control" id="rejectionReason" name="reason" rows="2" 
+                                          placeholder="Enter reason for rejection..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-reject w-100" 
+                                    onclick="return confirm('Reject identity verification for <%= user.username %>? This will remove the document.')">
+                                <i class="bi bi-x-circle"></i> Reject Verification
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Back Button -->
+    <div class="mt-4">
+        <a href="/admin/dashboard" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+

@@ -1,0 +1,405 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+.payment-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.payment-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.payment-form {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.booking-summary {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.summary-row.total {
+    border-top: 2px solid #dee2e6;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.payment-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.payment-method {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-method:hover {
+    border-color: #667eea;
+    background-color: #f8f9ff;
+}
+
+.payment-method.selected {
+    border-color: #667eea;
+    background-color: #f8f9ff;
+}
+
+.payment-method i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #667eea;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section h5 {
+    color: #495057;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.card-inputs {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .card-inputs {
+        grid-template-columns: 1fr;
+    }
+}
+
+.security-notice {
+    background: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.security-notice i {
+    color: #0066cc;
+    margin-right: 0.5rem;
+}
+</style>
+
+<div class="payment-container">
+    <!-- Payment Header -->
+    <div class="payment-header">
+        <h1 class="display-6 mb-3">Complete Your Booking</h1>
+        <p class="lead mb-0">Secure payment to confirm your reservation</p>
+        <% if(booking.isFromListing) { %>
+            <div class="mt-3 p-3 bg-white bg-opacity-20 rounded">
+                <small>
+                    <i class="bi bi-info-circle me-1"></i>
+                    You're booking directly from the listing page. Please review your dates and guest count below.
+                </small>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Payment Form -->
+        <div class="col-lg-8">
+            <div class="payment-form">
+                <h4 class="mb-4">Payment Information</h4>
+                
+                <!-- Security Notice -->
+                <div class="security-notice">
+                    <i class="bi bi-shield-check"></i>
+                    <strong>Secure Payment:</strong> Your payment information is encrypted and secure. 
+                    We never store your full card details.
+                </div>
+                
+                <form id="payment-form" method="POST" action="/bookings/<%= booking.listing._id || booking.listing %>/payment">
+                    <!-- Hidden booking data fields for direct listing access -->
+                    <% if(booking.isFromListing) { %>
+                        <input type="hidden" name="checkIn" value="<%= booking.checkIn %>">
+                        <input type="hidden" name="checkOut" value="<%= booking.checkOut %>">
+                        <input type="hidden" name="guests" value="<%= booking.guests %>">
+                        <input type="hidden" name="specialRequests" value="">
+                    <% } %>
+                    <!-- Payment Method Selection -->
+                    <div class="form-section">
+                        <h5><i class="bi bi-credit-card me-2"></i>Payment Method</h5>
+                        <div class="payment-methods">
+                            <div class="payment-method selected" onclick="selectPaymentMethod('card')">
+                                <i class="bi bi-credit-card"></i>
+                                <div>Credit/Debit Card</div>
+                            </div>
+                            <div class="payment-method" onclick="selectPaymentMethod('paypal')">
+                                <i class="bi bi-paypal"></i>
+                                <div>PayPal</div>
+                            </div>
+                            <div class="payment-method" onclick="selectPaymentMethod('bank')">
+                                <i class="bi bi-bank"></i>
+                                <div>Bank Transfer</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="payment-method" name="paymentMethod" value="card">
+                    </div>
+
+                    <!-- Card Details -->
+                    <div id="card-details" class="form-section">
+                        <h5><i class="bi bi-credit-card me-2"></i>Card Details</h5>
+                        
+                        <div class="mb-3">
+                            <label for="card-number" class="form-label">Card Number</label>
+                            <input type="text" class="form-control" id="card-number" name="cardNumber" 
+                                   placeholder="1234 5678 9012 3456" maxlength="19" required>
+                        </div>
+                        
+                        <div class="card-inputs">
+                            <div>
+                                <label for="card-holder" class="form-label">Cardholder Name</label>
+                                <input type="text" class="form-control" id="card-holder" name="cardHolder" 
+                                       placeholder="John Doe" required>
+                            </div>
+                            <div>
+                                <label for="expiry" class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" id="expiry" name="expiry" 
+                                       placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div>
+                                <label for="cvv" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvv" name="cvv" 
+                                       placeholder="123" maxlength="4" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Billing Address -->
+                    <div class="form-section">
+                        <h5><i class="bi bi-geo-alt me-2"></i>Billing Address</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="billing-address" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="billing-address" name="billingAddress" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="billing-city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="billing-city" name="billingCity" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="billing-state" class="form-label">State/Province</label>
+                                <input type="text" class="form-control" id="billing-state" name="billingState" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="billing-zip" class="form-label">ZIP/Postal Code</label>
+                                <input type="text" class="form-control" id="billing-zip" name="billingZip" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-section">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and 
+                                <a href="/privacy" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cancellation" name="cancellation" required>
+                            <label class="form-check-label" for="cancellation">
+                                I understand the <a href="/cancellation-policy" target="_blank">cancellation policy</a>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg" id="submit-btn">
+                            <i class="bi bi-lock me-2"></i>Pay ₹<%= booking.total %> and Confirm Booking
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column - Booking Summary -->
+        <div class="col-lg-4">
+            <div class="booking-summary">
+                <h5 class="mb-3">Booking Summary</h5>
+                
+                <div class="summary-row">
+                    <span>Check-in</span>
+                    <span><%= booking.checkIn ? new Date(booking.checkIn).toLocaleDateString() : 'Not selected' %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Check-out</span>
+                    <span><%= booking.checkOut ? new Date(booking.checkOut).toLocaleDateString() : 'Not selected' %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Duration</span>
+                    <span><%= booking.nights ? `${booking.nights} night${booking.nights > 1 ? 's' : ''}` : '1 night' %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Guests</span>
+                    <span><%= booking.guests || 1 %></span>
+                </div>
+                
+                <hr>
+                
+                <div class="summary-row">
+                    <span>Base price</span>
+                    <span>₹<%= booking.basePrice %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Cleaning fee</span>
+                    <span>₹<%= booking.cleaningFee %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Service fee</span>
+                    <span>₹<%= booking.serviceFee %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Taxes</span>
+                    <span>₹<%= booking.taxes || 0 %></span>
+                </div>
+                
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span>₹<%= booking.total %></span>
+                </div>
+                
+                <div class="mt-3 p-3 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        You won't be charged until the host confirms your booking.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedPaymentMethod = 'card';
+
+function selectPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    document.getElementById('payment-method').value = method;
+    
+    // Update UI
+    document.querySelectorAll('.payment-method').forEach(el => {
+        el.classList.remove('selected');
+    });
+    event.currentTarget.classList.add('selected');
+    
+    // Show/hide relevant form sections
+    const cardDetails = document.getElementById('card-details');
+    const cardInputs = cardDetails.querySelectorAll('input');
+    
+    if (method === 'card') {
+        cardDetails.style.display = 'block';
+        // Add required attribute back to card inputs
+        cardInputs.forEach(input => {
+            if (input.dataset.originalRequired !== 'false') {
+                input.setAttribute('required', 'required');
+            }
+        });
+    } else {
+        cardDetails.style.display = 'none';
+        // Remove required attribute from card inputs when hidden
+        cardInputs.forEach(input => {
+            input.removeAttribute('required');
+        });
+    }
+}
+
+// Card number formatting
+document.getElementById('card-number').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+    e.target.value = formattedValue;
+});
+
+// Expiry date formatting
+document.getElementById('expiry').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    }
+    e.target.value = value;
+});
+
+// CVV formatting
+document.getElementById('cvv').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '');
+});
+
+// Form validation
+document.getElementById('payment-form').addEventListener('submit', function(e) {
+    const terms = document.getElementById('terms').checked;
+    const cancellation = document.getElementById('cancellation').checked;
+    
+    if (!terms || !cancellation) {
+        e.preventDefault();
+        alert('Please accept all terms and conditions to proceed.');
+        return;
+    }
+    
+    // Remove required attribute from hidden fields
+    const cardDetails = document.getElementById('card-details');
+    if (cardDetails.style.display === 'none') {
+        const cardInputs = cardDetails.querySelectorAll('input[required]');
+        cardInputs.forEach(input => {
+            input.removeAttribute('required');
+        });
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Processing...';
+    submitBtn.disabled = true;
+});
+
+// Auto-fill billing address if available
+document.addEventListener('DOMContentLoaded', function() {
+    // You could populate this from user profile data
+    // For now, we'll leave it empty for user input
+});
+</script>

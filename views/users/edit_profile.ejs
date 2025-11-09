@@ -1,0 +1,382 @@
+<% layout("layouts/boilerplate") %>
+
+    <style>
+        .profile-edit-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-card {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: none;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .profile-picture-preview {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #e1e5eb;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-back {
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 600;
+        }
+
+        /* Responsive Design for Edit Profile Page */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+
+            .profile-edit-header {
+                padding: 1.5rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .section-card {
+                margin-bottom: 1rem;
+                padding: 1rem;
+            }
+
+            .card-body {
+                padding: 1rem !important;
+            }
+
+            .col-md-8,
+            .col-md-6,
+            .col-md-4,
+            .col-auto {
+                width: 100% !important;
+                margin-bottom: 1rem;
+            }
+
+            .form-control,
+            .form-select {
+                margin: 0.5rem 0;
+                padding: 0.75rem;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .btn {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+
+            .row {
+                margin-left: -0.5rem;
+                margin-right: -0.5rem;
+            }
+
+            .row > * {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            .profile-picture-preview {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            .profile-edit-header {
+                padding: 1rem 0.75rem;
+            }
+
+            .section-card {
+                padding: 0.75rem;
+            }
+
+            .form-control,
+            .form-select {
+                padding: 0.625rem;
+            }
+
+            .profile-picture-preview {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+
+    <div class="container mt-4">
+        <div class="profile-edit-header">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="mb-0">Edit Profile</h2>
+                    <p class="mb-0">Update your personal information and preferences</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form method="POST" action="/profile/<%= user._id %>?_method=PUT" enctype="multipart/form-data"
+                    class="needs-validation" novalidate>
+
+                    <!-- Profile Picture -->
+                    <div class="card section-card">
+                        <div class="card-body">
+                            <h5 class="section-title">Profile Picture</h5>
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <% if(user.profile && user.profile.profilePicture) { %>
+                                        <img src="<%= user.profile.profilePicture.url %>"
+                                            class="rounded-circle profile-picture-preview" width="100" height="100"
+                                            style="object-fit: cover;" alt="Current Profile Picture">
+                                        <% } else { %>
+                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center profile-picture-preview"
+                                                style="width: 100px; height: 100px;">
+                                                <i class="bi bi-person display-5 text-secondary"></i>
+                                            </div>
+                                            <% } %>
+                                </div>
+                                <div class="col">
+                                    <input type="file" class="form-control" id="profilePicture" name="profilePicture"
+                                        accept="image/*">
+                                    <small class="text-muted">JPG, PNG or GIF. Max file size 5MB.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Basic Information -->
+                    <div class="card section-card">
+                        <div class="card-body">
+                            <h5 class="section-title">Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" name="firstName"
+                                            value="<%= user.profile && user.profile.firstName || '' %>">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="lastName" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="lastName" name="lastName"
+                                            value="<%= user.profile && user.profile.lastName || '' %>">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">Bio</label>
+                                <textarea class="form-control" id="bio" name="bio" rows="4"
+                                    placeholder="Tell us about yourself..."><%= user.profile && user.profile.bio || '' %></textarea>
+                                <small class="text-muted">Describe yourself in a few words.</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone"
+                                            value="<%= user.profile && user.profile.phone || '' %>"
+                                            placeholder="+1 (555) 123-4567">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="languages" class="form-label">Languages</label>
+                                        <input type="text" class="form-control" id="languages" name="languages"
+                                            value="<%= user.profile && user.profile.languages ? user.profile.languages.join(', ') : '' %>"
+                                            placeholder="English, Spanish, French">
+                                        <small class="text-muted">Separate multiple languages with commas.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="card section-card">
+                        <div class="card-body">
+                            <h5 class="section-title">Address</h5>
+                            <div class="mb-3">
+                                <label for="street" class="form-label">Street Address</label>
+                                <input type="text" class="form-control" id="street" name="street"
+                                    value="<%= user.profile && user.profile.address && user.profile.address.street || '' %>">
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="city" class="form-label">City</label>
+                                        <input type="text" class="form-control" id="city" name="city"
+                                            value="<%= user.profile && user.profile.address && user.profile.address.city || '' %>">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="state" class="form-label">State/Province</label>
+                                        <input type="text" class="form-control" id="state" name="state"
+                                            value="<%= user.profile && user.profile.address && user.profile.address.state || '' %>">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="country" class="form-label">Country</label>
+                                        <input type="text" class="form-control" id="country" name="country"
+                                            value="<%= user.profile && user.profile.address && user.profile.address.country || '' %>">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="zipCode" class="form-label">Zip/Postal Code</label>
+                                        <input type="text" class="form-control" id="zipCode" name="zipCode"
+                                            value="<%= user.profile && user.profile.address && user.profile.address.zipCode || '' %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Identity Verification -->
+                    <div class="card section-card">
+                        <div class="card-body">
+                            <h5 class="section-title">
+                                <i class="bi bi-shield-check"></i> Identity Verification
+                            </h5>
+                            <p class="text-muted mb-3">
+                                Upload a government-issued ID (Driver's License, Passport, or National ID) to verify your identity. This helps build trust with other users.
+                            </p>
+                            
+                            <% if(user.profile && user.profile.identityDocument && user.profile.identityDocument.url) { %>
+                                <div class="alert alert-info mb-3">
+                                    <i class="bi bi-info-circle"></i> 
+                                    <strong>Identity document uploaded.</strong>
+                                    <% if(user.profile.verified && user.profile.verified.identity) { %>
+                                        <span class="text-success">Your identity has been verified.</span>
+                                    <% } else { %>
+                                        <span class="text-warning">Your document is under review.</span>
+                                    <% } %>
+                                </div>
+                                <div class="mb-3">
+                                    <a href="/profile/<%= user._id %>/document" class="btn btn-outline-primary btn-sm" target="_blank">
+                                        <i class="bi bi-eye"></i> View Current Document
+                                    </a>
+                                </div>
+                            <% } else { %>
+                                <div class="alert alert-secondary mb-3">
+                                    <i class="bi bi-info-circle"></i> 
+                                    <strong>No identity document uploaded yet.</strong>
+                                    <span class="text-muted">Please upload a document below to verify your identity.</span>
+                                </div>
+                            <% } %>
+
+                            <div class="mb-3">
+                                <label for="identityDocument" class="form-label">Identity Document</label>
+                                <input type="file" class="form-control" id="identityDocument" name="identityDocument"
+                                    accept="image/*,.pdf">
+                                <small class="text-muted">JPG, PNG, or PDF. Max file size 5MB. Accepted documents: Driver's License, Passport, National ID Card.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Host Settings -->
+                    <div class="card section-card">
+                        <div class="card-body">
+                            <h5 class="section-title">Host Settings</h5>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="isHost" name="isHost" <%=user.host
+                                    && user.host.isHost ? 'checked' : '' %>>
+                                <label class="form-check-label" for="isHost">
+                                    <strong>I want to be a host</strong>
+                                </label>
+                                <p class="text-muted mt-2 mb-0">
+                                    Enable this to start hosting guests and create property listings.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="/profile/<%= user._id %>" class="btn btn-back btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Profile
+                        </a>
+                        <button type="submit" class="btn btn-save">
+                            <i class="bi bi-check"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form validation
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>

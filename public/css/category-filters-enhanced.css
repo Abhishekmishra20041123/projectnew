@@ -1,0 +1,361 @@
+/* Enhanced Category Filters Styles */
+
+.filter-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #ff385c transparent;
+}
+
+.filter-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.filter-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.filter-wrapper::-webkit-scrollbar-thumb {
+    background: #ff385c;
+    border-radius: 3px;
+}
+
+.filter {
+    text-align: center;
+    text-decoration: none;
+    color: #222222;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.filter::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ff385c 0%, #e31c5f 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.filter > div {
+    position: relative;
+    z-index: 1;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f1f3f5;
+}
+
+.filter i {
+    font-size: 1.875rem;
+    color: #222222;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+    position: relative;
+    display: block;
+}
+
+.filter p {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+    color: #222222;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+/* Hover State */
+.filter:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(255, 56, 92, 0.2);
+    border-color: #ff385c;
+}
+
+.filter:hover::before {
+    opacity: 0.05;
+}
+
+.filter:hover > div {
+    background: linear-gradient(135deg, #fff5f6 0%, #ffeef0 100%);
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 56, 92, 0.3);
+    border-color: #ff385c;
+}
+
+.filter:hover i {
+    color: #ff385c;
+    transform: scale(1.1);
+    filter: drop-shadow(0 2px 4px rgba(255, 56, 92, 0.3));
+}
+
+.filter:hover p {
+    color: #ff385c;
+    font-weight: 600;
+}
+
+/* Active State */
+.filter.active {
+    background: linear-gradient(135deg, #ff385c 0%, #e31c5f 100%);
+    border-color: #ff385c;
+    box-shadow: 0 4px 16px rgba(255, 56, 92, 0.3);
+    transform: translateY(-2px);
+}
+
+.filter.active::before {
+    opacity: 0;
+}
+
+.filter.active > div {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.filter.active i {
+    color: #ffffff;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+    transform: scale(1.1);
+}
+
+.filter.active p {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Icon-specific background enhancements */
+.filter[href="/listings"] > div,
+.filter[href="/listings?"] > div { /* Globe - All */
+    background: linear-gradient(135deg, #e8ecff 0%, #f0f4ff 100%);
+}
+
+.filter[href*="Trending"] > div { /* Fire - Trending */
+    background: linear-gradient(135deg, #fff0f5 0%, #ffeef0 100%);
+}
+
+.filter[href*="Rooms"] > div { /* Bed - Rooms */
+    background: linear-gradient(135deg, #e6f4ff 0%, #f0f8ff 100%);
+}
+
+.filter[href*="Mountain"] > div { /* Mountain - Mountain Cities */
+    background: linear-gradient(135deg, #e6faf0 0%, #f0fdf4 100%);
+}
+
+.filter[href*="Castles"] > div { /* Castle */
+    background: linear-gradient(135deg, #fff5e6 0%, #fffaf0 100%);
+}
+
+.filter[href*="Swimming"] > div { /* Swimming */
+    background: linear-gradient(135deg, #e0f7fa 0%, #f0fdfa 100%);
+}
+
+.filter[href*="Camping"] > div { /* Camping */
+    background: linear-gradient(135deg, #f0fdf4 0%, #f5fdf9 100%);
+}
+
+.filter[href*="Cow"] > div { /* Cow */
+    background: linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%);
+}
+
+.filter[href*="Bus"] > div { /* Bus */
+    background: linear-gradient(135deg, #fff7ed 0%, #fffaf5 100%);
+}
+
+.filter[href*="Beaches"] > div { /* Beach */
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+}
+
+.filter[href*="Vaccant"] > div,
+.filter[href*="Vacant"] > div { /* Door - Vacant */
+    background: linear-gradient(135deg, #fff4e6 0%, #fffaf0 100%);
+}
+
+.filter[href*="Hotel"] > div { /* Hotel */
+    background: linear-gradient(135deg, #ffe5e5 0%, #fff0f0 100%);
+}
+
+/* Icon colors for better visibility */
+.filter[href="/listings"] i,
+.filter[href="/listings?"] i { /* Globe - All */
+    color: #667eea;
+}
+
+.filter[href*="Trending"] i { /* Fire - Trending */
+    color: #f5576c;
+}
+
+.filter[href*="Rooms"] i { /* Bed - Rooms */
+    color: #4facfe;
+}
+
+.filter[href*="Mountain"] i { /* Mountain - Mountain Cities */
+    color: #43e97b;
+}
+
+.filter[href*="Castles"] i { /* Castle */
+    color: #fa709a;
+}
+
+.filter[href*="Swimming"] i { /* Swimming */
+    color: #30cfd0;
+}
+
+.filter[href*="Camping"] i { /* Camping */
+    color: #38a169;
+}
+
+.filter[href*="Cow"] i { /* Cow */
+    color: #ff9a9e;
+}
+
+.filter[href*="Bus"] i { /* Bus */
+    color: #fcb69f;
+}
+
+.filter[href*="Beaches"] i { /* Beach */
+    color: #a1c4fd;
+}
+
+.filter[href*="Vaccant"] i,
+.filter[href*="Vacant"] i { /* Door - Vacant */
+    color: #ff9a56;
+}
+
+.filter[href*="Hotel"] i { /* Hotel */
+    color: #ff6b6b;
+}
+
+/* Active state overrides */
+.filter.active i {
+    color: #ffffff !important;
+}
+
+/* Enhanced Tax Toggle */
+.tax-toggle {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.tax-toggle:hover {
+    border-color: #ff385c;
+    box-shadow: 0 4px 12px rgba(255, 56, 92, 0.15);
+}
+
+.tax-toggle .form-check-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #222222;
+    margin: 0;
+    cursor: pointer;
+}
+
+.tax-toggle .form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+    cursor: pointer;
+    border-color: #dee2e6;
+}
+
+.tax-toggle .form-check-input:checked {
+    background-color: #ff385c;
+    border-color: #ff385c;
+}
+
+.tax-toggle .form-check-input:focus {
+    border-color: #ff385c;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(255, 56, 92, 0.25);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .filter-wrapper {
+        gap: 0.75rem;
+        padding: 1rem 0;
+        flex-wrap: nowrap;
+    }
+    
+    .filter {
+        min-width: 70px;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .filter > div {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .filter i {
+        font-size: 1.5rem;
+    }
+    
+    .filter p {
+        font-size: 0.75rem;
+    }
+    
+    .tax-toggle {
+        flex-shrink: 0;
+        margin-left: auto;
+    }
+}
+
+/* Animation for filter items */
+@keyframes filterPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.filter.active {
+    animation: filterPulse 0.6s ease;
+}
+
+/* Smooth scroll for horizontal overflow */
+.filter-wrapper {
+    scroll-behavior: smooth;
+}
+

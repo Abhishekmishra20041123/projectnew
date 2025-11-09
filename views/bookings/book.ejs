@@ -1,0 +1,909 @@
+<% layout("/layouts/boilerplate") %>
+
+    <style>
+        :root {
+            --primary-color: #ff385c;
+            --primary-hover: #e31c5f;
+            --secondary-color: #00848a;
+            --text-primary: #222222;
+            --text-secondary: #717171;
+            --border-color: #dddddd;
+            --bg-light: #f7f7f7;
+            --shadow-light: 0 2px 16px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 6px 20px rgba(0, 0, 0, 0.12);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .booking-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .booking-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            color: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .enhanced-booking-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: var(--transition);
+            margin-bottom: 2rem;
+        }
+
+        .enhanced-booking-card:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .booking-form-container {
+            padding: 24px;
+        }
+
+        .date-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 16px;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .date-inputs:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+
+        .date-inputs.focused {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.2);
+        }
+
+        .date-input-group {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .date-input-group:first-child {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .date-input-group:hover {
+            background-color: rgba(255, 56, 92, 0.05);
+        }
+
+        .date-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .date-value {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .date-value.placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .guests-selector {
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .guests-selector:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+
+        .guests-selector.focused {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.2);
+        }
+
+        .guests-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .guests-value {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-arrow {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .guests-selector.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .guest-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .guest-control:last-child {
+            border-bottom: none;
+        }
+
+        .guest-info h6 {
+            margin: 0 0 4px 0;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .guest-info p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .counter-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .counter-btn:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .counter-btn:disabled {
+            background-color: var(--bg-light);
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .counter-value {
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 24px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .enhanced-reserve-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            border: none;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 16px 24px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .enhanced-reserve-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .enhanced-reserve-btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .price-breakdown {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            transition: var(--transition);
+            border-radius: 6px;
+        }
+
+        .price-row:hover {
+            background-color: rgba(255, 56, 92, 0.05);
+            padding: 8px 12px;
+            margin: 4px -12px 12px;
+        }
+
+        .price-total {
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+            margin-top: 16px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .listing-preview {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-light);
+        }
+
+        .listing-preview img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h5 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .date-selector-container {
+            display: flex;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: white;
+        }
+
+        .date-selector {
+            flex: 1;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .date-selector:last-child {
+            border-right: none;
+        }
+
+        .date-selector:hover {
+            background-color: var(--bg-light);
+        }
+
+        .date-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .date-value {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .date-separator {
+            width: 1px;
+            background-color: var(--border-color);
+        }
+
+        .calendar-container {
+            padding: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .calendar-nav:hover {
+            background-color: var(--bg-light);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 8px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .calendar-day:hover {
+            background-color: var(--bg-light);
+        }
+
+        .calendar-day.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .calendar-day.in-range {
+            background-color: rgba(255, 56, 92, 0.1);
+        }
+
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.disabled:hover {
+            background-color: transparent;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .date-selector-container {
+                flex-direction: column;
+            }
+
+            .date-selector {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .date-selector:last-child {
+                border-bottom: none;
+            }
+
+            .date-separator {
+                display: none;
+            }
+        }
+    </style>
+
+    <div class="booking-container">
+        <!-- Booking Header -->
+        <div class="booking-header">
+            <h1 class="display-6 mb-3">Book Your Stay</h1>
+            <p class="lead mb-0">Complete your reservation for this amazing place</p>
+        </div>
+
+        <div class="row">
+            <!-- Left Column - Booking Form -->
+            <div class="col-lg-8">
+                <div class="enhanced-booking-card">
+                    <div class="booking-form-container">
+                        <h4 class="mb-4">Booking Details</h4>
+                        
+                        <form id="booking-form" action="/bookings/listings/<%= listing._id %>/book" method="POST">
+                            <!-- Date Selection Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-calendar-alt me-2"></i>Select Dates</h5>
+                                <div class="date-selector-container">
+                                    <div class="date-selector" id="checkInSelector" data-bs-toggle="modal" data-bs-target="#dateModal" data-date-type="checkin">
+                                        <div class="date-label">CHECK-IN</div>
+                                        <div class="date-value" id="checkInDisplay">
+                                            <% if (checkIn) { %>
+                                                <%= new Date(checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                            <% } else { %>
+                                                Add date
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <div class="date-separator"></div>
+                                    <div class="date-selector" id="checkOutSelector" data-bs-toggle="modal" data-bs-target="#dateModal" data-date-type="checkout">
+                                        <div class="date-label">CHECK-OUT</div>
+                                        <div class="date-value" id="checkOutDisplay">
+                                            <% if (checkOut) { %>
+                                                <%= new Date(checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                            <% } else { %>
+                                                Add date
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Hidden inputs for form submission -->
+                                <input type="hidden" id="checkIn" name="checkIn" value="<%= checkIn || '' %>">
+                                <input type="hidden" id="checkOut" name="checkOut" value="<%= checkOut || '' %>">
+                            </div>
+
+                            <!-- Guest Selection Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-users me-2"></i>Number of Guests</h5>
+                                <div class="d-flex justify-content-between align-items-center p-3 border rounded">
+                                    <div>
+                                        <strong>Guests</strong>
+                                        <div class="text-muted small">Ages 13 or above</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="decreaseGuests" onclick="changeGuestCount(-1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <span id="guestCount" class="fw-bold"><%= guests || 1 %></span>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="increaseGuests" onclick="changeGuestCount(1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="guests" name="guests" value="<%= guests || 1 %>">
+                            </div>
+
+                            <!-- Special Requests Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-comment me-2"></i>Special Requests (Optional)</h5>
+                                <textarea class="form-control" name="specialRequests" rows="4"
+                                    placeholder="Any special requests or notes for your host..."></textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" id="reserveBtn">
+                                    Reserve - ₹<span id="totalAmount"><%= calculatedTotal || listing.price || 0 %></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Listing Preview & Price Summary -->
+            <div class="col-lg-4">
+                <!-- Listing Preview -->
+                <div class="enhanced-booking-card mb-4">
+                    <div class="listing-preview">
+                        <% if (listing.image && listing.image.length > 0) { %>
+                            <img src="<%= listing.image[0].url %>" alt="<%= listing.title %>" class="img-fluid">
+                        <% } %>
+                        <div class="p-3">
+                            <h6 class="mb-1"><%= listing.title %></h6>
+                            <p class="text-muted mb-1"><i class="fas fa-map-marker-alt"></i> <%= listing.location %></p>
+                            <div class="d-flex justify-content-between">
+                                <span>Price per night</span>
+                                <span class="fw-bold">₹<%= listing.price %></span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Accommodates</span>
+                                <span><%= listing.accommodates %> guests</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Property type</span>
+                                <span><%= listing.propertyType || 'Entire place' %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- House Rules Summary -->
+                <div class="enhanced-booking-card mb-4">
+                    <div class="p-3">
+                        <h6 class="mb-3">House Rules</h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Check-in</span>
+                            <span><%= listing.houseRules?.checkIn || '3:00 PM' %></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Check-out</span>
+                            <span><%= listing.houseRules?.checkOut || '11:00 AM' %></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Minimum stay</span>
+                            <span><%= listing.houseRules?.minStay || 1 %> nights</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Maximum stay</span>
+                            <span><%= listing.houseRules?.maxStay || 1125 %> nights</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Smoking</span>
+                            <span><%= listing.houseRules?.smokingAllowed ? 'Allowed' : 'Not allowed' %></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Pets</span>
+                            <span><%= listing.houseRules?.petsAllowed ? 'Allowed' : 'Not allowed' %></span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Events</span>
+                            <span><%= listing.houseRules?.eventsAllowed ? 'Allowed' : 'Not allowed' %></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Summary -->
+                <div class="enhanced-booking-card">
+                    <div class="p-3">
+                        <h6 class="mb-3">Price Summary</h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span id="nightlyRate">₹<%= listing.price %> x 1 night</span>
+                            <span id="basePrice">₹<%= listing.price %></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Cleaning fee</span>
+                            <span id="cleaningFee">₹<%= Math.round(listing.price * 0.1) %></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Service fee</span>
+                            <span id="serviceFee">₹<%= Math.round(listing.price * 0.14) %></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Taxes</span>
+                            <span id="taxes">₹<%= Math.round((listing.price + Math.round(listing.price * 0.1) + Math.round(listing.price * 0.14)) * 0.12) %></span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total</span>
+                            <span id="totalPrice">₹<%= listing.price + Math.round(listing.price * 0.1) + Math.round(listing.price * 0.14) + Math.round((listing.price + Math.round(listing.price * 0.1) + Math.round(listing.price * 0.14)) * 0.12) %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Selection Modal -->
+    <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dateModalLabel">Select dates</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <button type="button" class="calendar-nav" id="prevMonth">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h6 id="currentMonthYear"></h6>
+                            <button type="button" class="calendar-nav" id="nextMonth">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid">
+                            <!-- Calendar will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmDates" data-bs-dismiss="modal">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentGuests = parseInt('<%= guests || 1 %>');
+        const maxGuests = parseInt('<%= listing.accommodates || 10 %>');
+        const listingPrice = parseInt('<%= listing.price || 0 %>');
+        const minStay = parseInt('<%= listing.houseRules?.minStay || 1 %>');
+        
+        // Date selection variables
+        let selectedCheckIn = null;
+        let selectedCheckOut = null;
+        
+        // Initialize dates from server data
+        const checkInValue = '<%= checkIn || "" %>';
+        const checkOutValue = '<%= checkOut || "" %>';
+        
+        if (checkInValue && checkInValue.trim() !== '') {
+            selectedCheckIn = new Date(checkInValue);
+            console.log('Initialized check-in date:', selectedCheckIn);
+        }
+        
+        if (checkOutValue && checkOutValue.trim() !== '') {
+            selectedCheckOut = new Date(checkOutValue);
+            console.log('Initialized check-out date:', selectedCheckOut);
+        }
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let selectingDateType = 'checkin'; // 'checkin' or 'checkout'
+
+        // Calendar functionality
+        function generateCalendar(month, year) {
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            document.getElementById('currentMonthYear').textContent = `${monthNames[month]} ${year}`;
+            
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+            
+            // Add day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                calendarGrid.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                const currentDate = new Date(year, month, day);
+                
+                // Disable past dates
+                if (currentDate < today) {
+                    dayElement.classList.add('disabled');
+                } else {
+                    dayElement.addEventListener('click', () => selectDate(currentDate));
+                    
+                    // Highlight selected dates
+                    if (selectedCheckIn && currentDate.getTime() === selectedCheckIn.getTime()) {
+                        dayElement.classList.add('selected');
+                    }
+                    if (selectedCheckOut && currentDate.getTime() === selectedCheckOut.getTime()) {
+                        dayElement.classList.add('selected');
+                    }
+                    
+                    // Highlight dates in range
+                    if (selectedCheckIn && selectedCheckOut && 
+                        currentDate > selectedCheckIn && currentDate < selectedCheckOut) {
+                        dayElement.classList.add('in-range');
+                    }
+                }
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        function selectDate(date) {
+            if (selectingDateType === 'checkin') {
+                selectedCheckIn = date;
+                // Clear checkout if it's before new checkin or within minimum stay
+                if (selectedCheckOut && selectedCheckOut <= date) {
+                    selectedCheckOut = null;
+                }
+            } else {
+                // Ensure checkout is after checkin + minimum stay
+                if (selectedCheckIn) {
+                    const minCheckOut = new Date(selectedCheckIn);
+                    minCheckOut.setDate(minCheckOut.getDate() + minStay);
+                    if (date >= minCheckOut) {
+                        selectedCheckOut = date;
+                    } else {
+                        alert(`Minimum stay is ${minStay} night${minStay > 1 ? 's' : ''}`);
+                        return;
+                    }
+                } else {
+                    alert('Please select check-in date first');
+                    return;
+                }
+            }
+            
+            generateCalendar(currentMonth, currentYear);
+            updateDateDisplays();
+        }
+
+        function updateDateDisplays() {
+            const checkInDisplay = document.getElementById('checkInDisplay');
+            const checkOutDisplay = document.getElementById('checkOutDisplay');
+            
+            if (selectedCheckIn) {
+                checkInDisplay.textContent = selectedCheckIn.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                document.getElementById('checkIn').value = selectedCheckIn.toISOString().split('T')[0];
+            } else {
+                checkInDisplay.textContent = 'Add date';
+                document.getElementById('checkIn').value = '';
+            }
+            
+            if (selectedCheckOut) {
+                checkOutDisplay.textContent = selectedCheckOut.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                document.getElementById('checkOut').value = selectedCheckOut.toISOString().split('T')[0];
+            } else {
+                checkOutDisplay.textContent = 'Add date';
+                document.getElementById('checkOut').value = '';
+            }
+            
+            updatePriceCalculation();
+        }
+
+        // Guest counter functionality
+        function changeGuestCount(change) {
+            const newCount = currentGuests + change;
+            
+            if (newCount >= 1 && newCount <= maxGuests) {
+                currentGuests = newCount;
+                
+                // Update display
+                document.getElementById('guestCount').textContent = currentGuests;
+                document.getElementById('guests').value = currentGuests;
+                
+                // Update button states
+                document.getElementById('decreaseGuests').disabled = currentGuests <= 1;
+                document.getElementById('increaseGuests').disabled = currentGuests >= maxGuests;
+                
+                // Update price calculation
+                updatePriceCalculation();
+            }
+        }
+
+        // Price calculation functionality
+        function updatePriceCalculation() {
+            if (selectedCheckIn && selectedCheckOut) {
+                const nights = Math.ceil((selectedCheckOut - selectedCheckIn) / (1000 * 60 * 60 * 24));
+                
+                if (nights > 0) {
+                    const basePrice = listingPrice * nights;
+                    const cleaningFee = Math.round(basePrice * 0.1);
+                    const serviceFee = Math.round(basePrice * 0.14);
+                    const taxes = Math.round((basePrice + cleaningFee + serviceFee) * 0.12);
+                    const total = basePrice + cleaningFee + serviceFee + taxes;
+                    
+                    // Update displays
+                    document.getElementById('nightlyRate').textContent = `₹${listingPrice} x ${nights} night${nights > 1 ? 's' : ''}`;
+                    document.getElementById('basePrice').textContent = `₹${basePrice}`;
+                    document.getElementById('cleaningFee').textContent = `₹${cleaningFee}`;
+                    document.getElementById('serviceFee').textContent = `₹${serviceFee}`;
+                    document.getElementById('taxes').textContent = `₹${taxes}`;
+                    document.getElementById('totalPrice').textContent = `₹${total}`;
+                    document.getElementById('totalAmount').textContent = total;
+                }
+            }
+        }
+
+        // Form validation
+        function validateBookingForm(e) {
+            if (!selectedCheckIn || !selectedCheckOut) {
+                e.preventDefault();
+                alert('Please select both check-in and check-out dates');
+                return false;
+            }
+            
+            const nights = Math.ceil((selectedCheckOut - selectedCheckIn) / (1000 * 60 * 60 * 24));
+            
+            if (nights < minStay) {
+                e.preventDefault();
+                alert(`Minimum stay is ${minStay} night${minStay > 1 ? 's' : ''}`);
+                return false;
+            }
+            
+            if (currentGuests < 1 || currentGuests > maxGuests) {
+                e.preventDefault();
+                alert(`Please select between 1 and ${maxGuests} guests`);
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up date modal
+            const dateModal = document.getElementById('dateModal');
+            dateModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                selectingDateType = button.getAttribute('data-date-type');
+                generateCalendar(currentMonth, currentYear);
+            });
+            
+            // Calendar navigation
+            document.getElementById('prevMonth').addEventListener('click', function() {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                generateCalendar(currentMonth, currentYear);
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', function() {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                generateCalendar(currentMonth, currentYear);
+            });
+            
+            // Set up form validation
+            document.getElementById('booking-form').addEventListener('submit', validateBookingForm);
+            
+            // Initialize guest counter button states
+            document.getElementById('decreaseGuests').disabled = currentGuests <= 1;
+            document.getElementById('increaseGuests').disabled = currentGuests >= maxGuests;
+            
+            // Initialize displays
+            updateDateDisplays();
+        });
+    </script>
+
+<%- include('../includes/footer') %>

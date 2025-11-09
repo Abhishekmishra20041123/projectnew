@@ -1,0 +1,110 @@
+<% layout("layouts/boilerplate") %>
+
+    <div class="container mt-4">
+        <h1>Map Test Page</h1>
+
+        <!-- Debug information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Debug Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Map Token Available:</strong>
+                    <%= typeof mapToken !=='undefined' && mapToken ? 'Yes' : 'No' %>
+                </p>
+                <p><strong>Listing Data Available:</strong>
+                    <%= typeof listdata !=='undefined' && listdata ? 'Yes' : 'No' %>
+                </p>
+                <% if (typeof listdata !=='undefined' && listdata) { %>
+                    <p><strong>Listing Title:</strong>
+                        <%= listdata.title %>
+                    </p>
+                    <% if (listdata.geometry) { %>
+                        <p><strong>Geometry Data:</strong>
+                            <%= JSON.stringify(listdata.geometry) %>
+                        </p>
+                        <% } else { %>
+                            <p><strong>Geometry Data:</strong> Not available</p>
+                            <% } %>
+                                <% } %>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Map Display</h5>
+            </div>
+            <div class="card-body">
+                <div id="map" style="height: 400px; border: 1px solid #ddd; border-radius: 8px;"></div>
+                <div id="map-status" class="mt-2 text-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Debug logging
+        console.log('=== DEBUG: Test Map Template ===');
+        console.log('mapToken typeof:', typeof mapToken);
+        console.log('mapToken value:', mapToken);
+        console.log('listdata typeof:', typeof listdata);
+        console.log('listdata value:', listdata);
+
+        // Process variables
+        const mapToken = '<%= typeof mapToken !== "undefined" ? mapToken : "" %>';
+        const listing = <% - JSON.stringify(listdata) %>;
+
+        // More debug logging
+        console.log('Processed mapToken:', mapToken);
+        console.log('Processed listing:', listing);
+
+        // Update status display
+        const statusElement = document.getElementById('map-status');
+
+        // Check if mapToken exists
+        if (!mapToken || mapToken.trim() === '') {
+            console.error('Map token is not available');
+            statusElement.innerHTML = '<div class="alert alert-warning">Map token not available</div>';
+        } else if (!listing || !listing.geometry || !listing.geometry.coordinates) {
+            console.error('Listing geometry data is not available:', listing);
+            statusElement.innerHTML = '<div class="alert alert-info">Location data not available for this listing</div>';
+        } else {
+            try {
+                // Validate coordinates
+                const coordinates = listing.geometry.coordinates;
+                if (!Array.isArray(coordinates) || coordinates.length !== 2) {
+                    throw new Error('Invalid coordinates format');
+                }
+
+                const [lng, lat] = coordinates;
+                if (lat < -90 || lat > 90) {
+                    throw new Error('Latitude must be between -90 and 90');
+                }
+
+                // Initialize map
+                console.log('Initializing map with coordinates:', coordinates);
+                statusElement.innerHTML = '<div class="alert alert-info">Initializing map...</div>';
+
+                mapboxgl.accessToken = mapToken;
+                const map = new mapboxgl.Map({
+                    container: 'map',
+                    style: "mapbox://styles/mapbox/streets-v12",
+                    center: coordinates,
+                    zoom: 8
+                });
+
+                // Add marker
+                const marker = new mapboxgl.Marker({ color: "red" })
+                    .setLngLat(coordinates)
+                    .setPopup(new mapboxgl.Popup({ closeOnClick: false })
+                        .setHTML(`<p><strong>${listing.title}</strong><br>Exact location after booking!</p>`))
+                    .addTo(map);
+
+                console.log('Map initialized successfully');
+                statusElement.innerHTML = '<div class="alert alert-success">Map loaded successfully</div>';
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                statusElement.innerHTML = `<div class="alert alert-danger">Error loading map: ${error.message}</div>`;
+            }
+        }
+    </script>

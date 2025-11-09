@@ -1,0 +1,952 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+.payment-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.payment-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    margin-bottom: 3rem;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+}
+
+.payment-step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: bold;
+    margin: 0 1rem;
+    position: relative;
+}
+
+.step.active {
+    background: #28a745;
+    box-shadow: 0 0 20px rgba(40, 167, 69, 0.5);
+}
+
+.step::after {
+    content: '';
+    position: absolute;
+    right: -2rem;
+    width: 2rem;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.step:last-child::after {
+    display: none;
+}
+
+.payment-form {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.booking-summary {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row.total {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+    margin: 1rem -1rem -1rem -1rem;
+    padding: 1rem 2rem;
+    border-radius: 0 0 20px 20px;
+}
+
+.payment-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.payment-method {
+    border: 3px solid #e9ecef;
+    border-radius: 16px;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.payment-method::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.payment-method:hover::before {
+    left: 100%;
+}
+
+.payment-method:hover {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+}
+
+.payment-method.selected {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+.payment-method i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #667eea;
+}
+
+.payment-method.selected i {
+    color: white;
+}
+
+.payment-method .method-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.payment-method .method-desc {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+}
+
+.form-section {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 16px;
+    border-left: 4px solid #667eea;
+}
+
+.form-section h5 {
+    color: #495057;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+    display: flex;
+    align-items: center;
+}
+
+.form-section h5 i {
+    margin-right: 0.5rem;
+    color: #667eea;
+}
+
+.card-inputs {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Responsive Design for Payment Page */
+@media (max-width: 768px) {
+    .payment-container {
+        padding: 1rem 0.75rem;
+    }
+
+    .payment-header {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .payment-form {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .booking-summary {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-inputs {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .payment-methods {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .form-section {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .summary-row {
+        padding: 0.75rem 0;
+        font-size: 0.9rem;
+    }
+
+    .summary-row.total {
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+
+    .row {
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+    }
+
+    .row > * {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .col-lg-8,
+    .col-lg-4 {
+        width: 100% !important;
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .payment-container {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .payment-header {
+        padding: 1rem 0.75rem;
+    }
+
+    .payment-form {
+        padding: 1rem 0.75rem;
+    }
+
+    .booking-summary {
+        padding: 1rem 0.75rem;
+    }
+
+    .form-section {
+        padding: 1rem 0.75rem;
+    }
+
+    .btn-payment {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        width: 100%;
+    }
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.security-notice {
+    background: linear-gradient(135deg, #e7f3ff 0%, #cce7ff 100%);
+    border: 2px solid #b3d9ff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.security-notice i {
+    color: #0066cc;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+}
+
+.btn-payment {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-payment::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-payment:hover::before {
+    left: 100%;
+}
+
+.btn-payment:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+}
+
+.btn-payment:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.payment-info {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+.success-message {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+.form-control.is-valid {
+    border-color: #28a745;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.5-.5 1.5 1.5 3-3 .5.5-3.5 3.5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 2.4 2.4m0-2.4L5.8 7'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.upi-examples {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.upi-examples .example {
+    display: inline-block;
+    background: #e7f3ff;
+    color: #0066cc;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin: 0.125rem;
+    font-family: monospace;
+}
+</style>
+
+<div class="payment-container">
+    <!-- Payment Header -->
+    <div class="payment-header">
+        <h1 class="display-5 mb-3">Complete Your Payment</h1>
+        <p class="lead mb-4">Secure checkout for your booking</p>
+        
+        <!-- Payment Steps -->
+        <div class="payment-step">
+            <div class="step">1</div>
+            <div class="step active">2</div>
+            <div class="step">3</div>
+        </div>
+        <div class="d-flex justify-content-between text-sm">
+            <span>Booking Details</span>
+            <span><strong>Payment</strong></span>
+            <span>Confirmation</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Payment Form -->
+        <div class="col-lg-8">
+            <div class="payment-form">
+                <h4 class="mb-4">Payment Information</h4>
+                
+                <!-- Security Notice -->
+                <div class="security-notice">
+                    <i class="bi bi-shield-check"></i>
+                    <div>
+                        <strong>Secure Payment:</strong> Your payment information is encrypted and secure. 
+                        We never store your full card details. All transactions are processed through industry-standard security protocols.
+                    </div>
+                </div>
+
+                <!-- Error/Success Messages -->
+                <div id="error-message" class="error-message"></div>
+                <div id="success-message" class="success-message"></div>
+                
+                <form id="payment-form" method="POST" action="/bookings/<%= booking.listing._id || booking.listing %>/payment">
+                    <!-- Hidden booking data fields -->
+                    <% if(booking.isFromListing) { %>
+                        <input type="hidden" name="checkIn" value="<%= booking.checkIn %>">
+                        <input type="hidden" name="checkOut" value="<%= booking.checkOut %>">
+                        <input type="hidden" name="guests" value="<%= booking.guests %>">
+                        <input type="hidden" name="specialRequests" value="">
+                    <% } %>
+                    
+                    <!-- Payment Method Selection -->
+                    <div class="form-section">
+                        <h5><i class="bi bi-credit-card"></i>Choose Payment Method</h5>
+                        <div class="payment-methods">
+                            <div class="payment-method selected" onclick="selectPaymentMethod('card')" data-method="card">
+                                <i class="bi bi-credit-card"></i>
+                                <div class="method-name">Credit/Debit Card</div>
+                                <div class="method-desc">Visa, Mastercard, American Express</div>
+                            </div>
+                            <div class="payment-method" onclick="selectPaymentMethod('paypal')" data-method="paypal">
+                                <i class="bi bi-paypal"></i>
+                                <div class="method-name">PayPal</div>
+                                <div class="method-desc">Pay with your PayPal account</div>
+                            </div>
+                            <div class="payment-method" onclick="selectPaymentMethod('bank')" data-method="bank">
+                                <i class="bi bi-bank"></i>
+                                <div class="method-name">Bank Transfer</div>
+                                <div class="method-desc">Direct bank transfer</div>
+                            </div>
+                            <div class="payment-method" onclick="selectPaymentMethod('upi')" data-method="upi">
+                                <i class="bi bi-phone"></i>
+                                <div class="method-name">UPI Payment</div>
+                                <div class="method-desc">Pay using UPI ID</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="payment-method" name="paymentMethod" value="card">
+                    </div>
+
+                    <!-- Card Details -->
+                    <div id="card-details" class="form-section">
+                        <h5><i class="bi bi-credit-card"></i>Card Details</h5>
+                        
+                        <div class="mb-3">
+                            <label for="card-number" class="form-label">Card Number</label>
+                            <input type="text" class="form-control" id="card-number" name="cardNumber" 
+                                   placeholder="1234 5678 9012 3456" maxlength="19" required>
+                        </div>
+                        
+                        <div class="card-inputs">
+                            <div>
+                                <label for="card-holder" class="form-label">Cardholder Name</label>
+                                <input type="text" class="form-control" id="card-holder" name="cardHolder" 
+                                       placeholder="John Doe" required>
+                            </div>
+                            <div>
+                                <label for="expiry" class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" id="expiry" name="expiry" 
+                                       placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div>
+                                <label for="cvv" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvv" name="cvv" 
+                                       placeholder="123" maxlength="4" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PayPal Info -->
+                    <div id="paypal-info" class="form-section" style="display: none;">
+                        <h5><i class="bi bi-paypal"></i>PayPal Payment</h5>
+                        <div class="payment-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            You will be redirected to PayPal to complete your payment securely.
+                        </div>
+                    </div>
+
+                    <!-- Bank Transfer Info -->
+                    <div id="bank-info" class="form-section" style="display: none;">
+                        <h5><i class="bi bi-bank"></i>Bank Transfer Details</h5>
+                        <div class="payment-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            After booking confirmation, you'll receive bank transfer instructions via email.
+                            Your booking will be confirmed once payment is received (usually 1-3 business days).
+                        </div>
+                    </div>
+
+                    <!-- UPI Payment Info -->
+                    <div id="upi-info" class="form-section" style="display: none;">
+                        <h5><i class="bi bi-phone"></i>UPI Payment</h5>
+                        <div class="mb-3">
+                            <label for="upi-id" class="form-label">UPI ID</label>
+                            <input type="text" class="form-control" id="upi-id" name="upiId" 
+                                   placeholder="yourname@paytm or 9876543210@ybl" maxlength="50">
+                            <div class="form-text">Enter your UPI ID (e.g., user@paytm, mobile@ybl, name@oksbi)</div>
+                            <div class="upi-examples">
+                                <strong>Popular UPI handles:</strong><br>
+                                <span class="example">user@paytm</span>
+                                <span class="example">mobile@ybl</span>
+                                <span class="example">name@oksbi</span>
+                                <span class="example">user@okaxis</span>
+                                <span class="example">name@okicici</span>
+                                <span class="example">user@okhdfcbank</span>
+                            </div>
+                        </div>
+                        <div class="payment-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            UPI payments are instant and secure. You'll receive a confirmation immediately after payment.
+                            Supported UPI apps: PhonePe, Google Pay, Paytm, BHIM, and all bank UPI apps.
+                        </div>
+                    </div>
+
+                    <!-- User Information Display -->
+                    <% if(typeof currUser !== 'undefined' && currUser) { %>
+                    <div class="form-section">
+                        <h5><i class="bi bi-person"></i>Guest Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" 
+                                    value="<%= currUser.profile && currUser.profile.firstName ? currUser.profile.firstName + ' ' + (currUser.profile.lastName || '') : currUser.username %>" 
+                                    readonly style="background-color: #f8f9fa;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="text" class="form-control" 
+                                    value="<%= currUser.email || currUser.username %>" 
+                                    readonly style="background-color: #f8f9fa;">
+                            </div>
+                        </div>
+                        <% if(currUser.profile && currUser.profile.phone) { %>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" 
+                                    value="<%= currUser.profile.phone %>" 
+                                    readonly style="background-color: #f8f9fa;">
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                    <% } %>
+
+                    <!-- Billing Address -->
+                    <div id="billing-section" class="form-section">
+                        <h5><i class="bi bi-geo-alt"></i>Billing Address</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="billing-address" class="form-label">Street Address</label>
+                                <input type="text" class="form-control" id="billing-address" name="billingAddress" 
+                                    value="<%= typeof currUser !== 'undefined' && currUser && currUser.profile && currUser.profile.address ? currUser.profile.address.street || '' : '' %>" 
+                                    required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="billing-city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="billing-city" name="billingCity" 
+                                    value="<%= typeof currUser !== 'undefined' && currUser && currUser.profile && currUser.profile.address ? currUser.profile.address.city || '' : '' %>" 
+                                    required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="billing-state" class="form-label">State/Province</label>
+                                <input type="text" class="form-control" id="billing-state" name="billingState" 
+                                    value="<%= typeof currUser !== 'undefined' && currUser && currUser.profile && currUser.profile.address ? currUser.profile.address.state || '' : '' %>" 
+                                    required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="billing-zip" class="form-label">ZIP/Postal Code</label>
+                                <input type="text" class="form-control" id="billing-zip" name="billingZip" 
+                                    value="<%= typeof currUser !== 'undefined' && currUser && currUser.profile && currUser.profile.address ? currUser.profile.address.zipCode || '' : '' %>" 
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-section">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and 
+                                <a href="/privacy" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cancellation" name="cancellation" required>
+                            <label class="form-check-label" for="cancellation">
+                                I understand the <a href="/cancellation-policy" target="_blank">cancellation policy</a>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-payment btn-lg" id="submit-btn">
+                            <i class="bi bi-lock me-2"></i>
+                            <span id="btn-text">Pay ₹<%= booking.total %> and Confirm Booking</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column - Booking Summary -->
+        <div class="col-lg-4">
+            <div class="booking-summary">
+                <h5 class="mb-3">Booking Summary</h5>
+                
+                <div class="summary-row">
+                    <span>Check-in</span>
+                    <span><%= booking.checkIn ? new Date(booking.checkIn).toLocaleDateString() : 'Not selected' %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Check-out</span>
+                    <span><%= booking.checkOut ? new Date(booking.checkOut).toLocaleDateString() : 'Not selected' %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Duration</span>
+                    <span><%= booking.nights || 1 %> night<%= (booking.nights || 1) > 1 ? 's' : '' %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Guests</span>
+                    <span><%= booking.guests || 1 %></span>
+                </div>
+                
+                <hr>
+                
+                <div class="summary-row">
+                    <span>Base price</span>
+                    <span>₹<%= booking.basePrice %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Cleaning fee</span>
+                    <span>₹<%= booking.cleaningFee %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Service fee</span>
+                    <span>₹<%= booking.serviceFee %></span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Taxes</span>
+                    <span>₹<%= booking.taxes || 0 %></span>
+                </div>
+                
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span>₹<%= booking.total %></span>
+                </div>
+                
+                <div class="mt-3 p-3 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        You won't be charged until the host confirms your booking.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loading-overlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <h5>Processing Payment...</h5>
+        <p>Please don't close this window</p>
+    </div>
+</div>
+
+<script>
+let selectedPaymentMethod = 'card';
+
+function selectPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    document.getElementById('payment-method').value = method;
+    
+    // Update UI
+    document.querySelectorAll('.payment-method').forEach(el => {
+        el.classList.remove('selected');
+    });
+    document.querySelector(`[data-method="${method}"]`).classList.add('selected');
+    
+    // Show/hide relevant sections
+    const cardDetails = document.getElementById('card-details');
+    const paypalInfo = document.getElementById('paypal-info');
+    const bankInfo = document.getElementById('bank-info');
+    const upiInfo = document.getElementById('upi-info');
+    const billingSection = document.getElementById('billing-section');
+    const btnText = document.getElementById('btn-text');
+    
+    // Hide all sections first
+    cardDetails.style.display = 'none';
+    paypalInfo.style.display = 'none';
+    bankInfo.style.display = 'none';
+    upiInfo.style.display = 'none';
+    billingSection.style.display = 'none';
+    
+    // Remove required attributes from all inputs
+    document.querySelectorAll('#card-details input, #billing-section input, #upi-info input').forEach(input => {
+        input.removeAttribute('required');
+    });
+    
+    // Show relevant section and set required attributes
+    if (method === 'card') {
+        cardDetails.style.display = 'block';
+        billingSection.style.display = 'block';
+        
+        // Add required attributes back
+        document.querySelectorAll('#card-details input, #billing-section input').forEach(input => {
+            input.setAttribute('required', 'required');
+        });
+        
+        btnText.innerHTML = `Pay ₹<%= booking.total %> and Confirm Booking`;
+    } else if (method === 'paypal') {
+        paypalInfo.style.display = 'block';
+        btnText.innerHTML = `Continue with PayPal - ₹<%= booking.total %>`;
+    } else if (method === 'bank') {
+        bankInfo.style.display = 'block';
+        btnText.innerHTML = `Confirm Booking - ₹<%= booking.total %>`;
+    } else if (method === 'upi') {
+        upiInfo.style.display = 'block';
+        
+        // Add required attribute to UPI ID
+        document.getElementById('upi-id').setAttribute('required', 'required');
+        
+        btnText.innerHTML = `Pay with UPI - ₹<%= booking.total %>`;
+    }
+}
+
+// Card number formatting
+document.getElementById('card-number').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+    e.target.value = formattedValue;
+});
+
+// Expiry date formatting
+document.getElementById('expiry').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    }
+    e.target.value = value;
+});
+
+// CVV formatting
+document.getElementById('cvv').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '');
+});
+
+// UPI ID validation and formatting
+document.getElementById('upi-id').addEventListener('input', function(e) {
+    let value = e.target.value.toLowerCase().trim();
+    
+    // Remove invalid characters (only allow alphanumeric, dots, hyphens, underscores, and @)
+    value = value.replace(/[^a-z0-9._@-]/g, '');
+    
+    // Ensure only one @ symbol
+    const atCount = (value.match(/@/g) || []).length;
+    if (atCount > 1) {
+        value = value.substring(0, value.lastIndexOf('@'));
+    }
+    
+    e.target.value = value;
+    
+    // Real-time validation feedback
+    const isValid = validateUPIFormat(value);
+    const input = e.target;
+    
+    if (value.length > 0) {
+        if (isValid) {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+        } else {
+            input.classList.remove('is-valid');
+            input.classList.add('is-invalid');
+        }
+    } else {
+        input.classList.remove('is-valid', 'is-invalid');
+    }
+});
+
+// UPI ID validation function
+function validateUPIFormat(upiId) {
+    if (!upiId || upiId.length < 5 || upiId.length > 50) return false;
+    
+    const upiRegex = /^[a-z0-9._-]+@[a-z0-9.-]+$/;
+    if (!upiRegex.test(upiId)) return false;
+    
+    // Check for valid UPI handle suffixes
+    const validHandles = [
+        'paytm', 'ybl', 'oksbi', 'okaxis', 'okicici', 'okhdfcbank', 
+        'okbizaxis', 'ibl', 'axl', 'upi', 'jupiteraxis', 'fbl',
+        'pnb', 'boi', 'cnrb', 'sbi', 'allbank', 'indianbank',
+        'federal', 'kotak', 'indus', 'unionbank', 'dbs', 'hsbc'
+    ];
+    
+    const handle = upiId.split('@')[1];
+    return validHandles.some(validHandle => handle.includes(validHandle));
+}
+
+// Form validation and submission
+document.getElementById('payment-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const terms = document.getElementById('terms').checked;
+    const cancellation = document.getElementById('cancellation').checked;
+    
+    if (!terms || !cancellation) {
+        showError('Please accept all terms and conditions to proceed.');
+        return;
+    }
+    
+    // Additional UPI validation on submit
+    if (selectedPaymentMethod === 'upi') {
+        const upiId = document.getElementById('upi-id').value;
+        if (!upiId || !validateUPIFormat(upiId)) {
+            showError('Please enter a valid UPI ID (e.g., yourname@paytm, 9876543210@ybl)');
+            return;
+        }
+    }
+    
+    // Show loading overlay
+    document.getElementById('loading-overlay').style.display = 'flex';
+    
+    // Disable submit button
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    
+    // Submit form after a short delay to show loading
+    setTimeout(() => {
+        this.submit();
+    }, 1000);
+});
+
+function showError(message) {
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    errorDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function showSuccess(message) {
+    const successDiv = document.getElementById('success-message');
+    successDiv.textContent = message;
+    successDiv.style.display = 'block';
+    successDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    selectPaymentMethod('card');
+});
+</script>

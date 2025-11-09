@@ -1,0 +1,7 @@
+.env
+node_modules/
+classroom/
+notes.txt
+*.pem
+*.key
+.DS_Store

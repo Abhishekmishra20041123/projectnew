@@ -1,0 +1,457 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Header with enhanced styling -->
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <div>
+                    <h2 class="mb-1 fw-bold text-dark">Booking Details</h2>
+                    <p class="text-muted mb-0">Booking ID: #<%= booking._id.toString().slice(-6).toUpperCase() %></p>
+                </div>
+                <span class="badge bg-<%= booking.status === 'confirmed' ? 'success' : 
+                                      booking.status === 'pending' ? 'warning' : 
+                                      booking.status === 'cancelled' ? 'danger' : 'secondary' %> fs-5 px-3 py-2 rounded-pill shadow-sm">
+                    <i class="bi bi-<%= booking.status === 'confirmed' ? 'check-circle' : 
+                                      booking.status === 'pending' ? 'clock' : 
+                                      booking.status === 'cancelled' ? 'x-circle' : 'circle' %> me-1"></i>
+                    <%= booking.status.charAt(0).toUpperCase() + booking.status.slice(1) %>
+                </span>
+            </div>
+
+            <!-- Enhanced property card -->
+            <div class="card mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-md-5">
+                        <div class="position-relative h-100" style="min-height: 280px;">
+                            <img src="<%= booking.listing.image.url %>" 
+                                 class="img-fluid h-100 w-100" 
+                                 style="object-fit: cover;" 
+                                 alt="<%= booking.listing.title %>">
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-dark bg-opacity-75 text-white">
+                                    <i class="bi bi-star-fill text-warning me-1"></i>4.8
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-body p-4 h-100 d-flex flex-column">
+                            <div class="flex-grow-1">
+                                <h4 class="card-title fw-bold mb-3 text-dark"><%= booking.listing.title %></h4>
+                                <p class="card-text mb-3">
+                                    <i class="bi bi-geo-alt text-primary me-2"></i> 
+                                    <span class="text-dark"><%= booking.listing.location %>, <%= booking.listing.country %></span>
+                                </p>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-house me-1"></i><%= booking.listing.propertyType || 'Entire place' %>
+                                    </span>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-people me-1"></i><%= booking.listing.accommodates || 1 %> guests
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="h5 fw-bold text-primary mb-0">₹<%= booking.totalPrice %></span>
+                                        <small class="text-muted"> total</small>
+                                    </div>
+                                    <a href="/listings/<%= booking.listing._id %>" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye me-1"></i>View Listing
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced details cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0 rounded-3">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="bi bi-calendar3 text-primary fs-5"></i>
+                                </div>
+                                <h6 class="card-title mb-0 fw-bold">Stay Details</h6>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                        <span class="text-muted">Check-in</span>
+                                        <strong class="text-dark"><%= new Date(booking.checkIn).toLocaleDateString('en-US', {weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'}) %></strong>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                        <span class="text-muted">Check-out</span>
+                                        <strong class="text-dark"><%= new Date(booking.checkOut).toLocaleDateString('en-US', {weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'}) %></strong>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                        <span class="text-muted">Duration</span>
+                                        <strong class="text-dark"><%= booking.nights %> nights</strong>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center py-2">
+                                        <span class="text-muted">Guests</span>
+                                        <strong class="text-dark">
+                                            <%= booking.guests.adults %> adults
+                                            <% if(booking.guests.children > 0) { %>
+                                                , <%= booking.guests.children %> children
+                                            <% } %>
+                                            <% if(booking.guests.infants > 0) { %>
+                                                , <%= booking.guests.infants %> infants
+                                            <% } %>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0 rounded-3">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="bi bi-credit-card text-success fs-5"></i>
+                                </div>
+                                <h6 class="card-title mb-0 fw-bold">Payment Details</h6>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                        <span class="text-muted">Total Amount</span>
+                                        <strong class="text-dark h6 mb-0">₹<%= booking.totalPrice %></strong>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                        <span class="text-muted">Payment Status</span>
+                                        <span class="badge bg-<%= booking.paymentStatus === 'paid' ? 'success' : 
+                                                                 booking.paymentStatus === 'pending' ? 'warning' : 'danger' %> rounded-pill">
+                                            <i class="bi bi-<%= booking.paymentStatus === 'paid' ? 'check-circle' : 
+                                                               booking.paymentStatus === 'pending' ? 'clock' : 'x-circle' %> me-1"></i>
+                                            <%= booking.paymentStatus.charAt(0).toUpperCase() + booking.paymentStatus.slice(1) %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <% if(booking.paymentId) { %>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center py-2">
+                                            <span class="text-muted">Payment ID</span>
+                                            <code class="small bg-light p-1 rounded"><%= booking.paymentId %></code>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cancellation Policy -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-2 me-3">
+                            <i class="bi bi-info-circle text-danger"></i>
+                        </div>
+                        <h6 class="card-title mb-0 fw-bold">Cancellation Policy</h6>
+                    </div>
+                    
+                    <div class="alert alert-light border mb-3">
+                        <p class="mb-2 small">Please review our cancellation policy before confirming your booking:</p>
+                        <ul class="mb-0 small">
+                            <li>More than 7 days before check-in: <span class="badge bg-success">100% refund</span></li>
+                            <li>3-7 days before check-in: <span class="badge bg-warning text-dark">50% refund</span></li>
+                            <li>1-3 days before check-in: <span class="badge bg-danger">25% refund</span></li>
+                            <li>Less than 24 hours before check-in: <span class="badge bg-dark">No refund</span></li>
+                        </ul>
+                    </div>
+                    
+                    <% 
+                    // Calculate time until check-in (only if we have a check-in date)
+                    let daysUntilCheckIn = 0;
+                    if (booking.checkIn) {
+                        const now = new Date();
+                        const checkIn = new Date(booking.checkIn);
+                        daysUntilCheckIn = Math.ceil((checkIn - now) / (1000 * 60 * 60 * 24));
+                    }
+                    %>
+                    
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="text-muted small">Current check-in status: </span>
+                        <span>
+                            <% if (daysUntilCheckIn > 7) { %>
+                                <span class="badge bg-success"><%= daysUntilCheckIn %> days until check-in</span>
+                            <% } else if (daysUntilCheckIn > 3) { %>
+                                <span class="badge bg-warning text-dark"><%= daysUntilCheckIn %> days until check-in</span>
+                            <% } else if (daysUntilCheckIn > 1) { %>
+                                <span class="badge bg-danger"><%= daysUntilCheckIn %> days until check-in</span>
+                            <% } else if (daysUntilCheckIn > 0) { %>
+                                <span class="badge bg-dark"><%= daysUntilCheckIn %> day until check-in</span>
+                            <% } else { %>
+                                <span class="badge bg-secondary">Check-in date passed</span>
+                            <% } %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Special Requests -->
+            <% if(booking.specialRequests) { %>
+                <div class="card mb-4 shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="bi bi-chat-text text-info fs-5"></i>
+                            </div>
+                            <h6 class="card-title mb-0 fw-bold">Special Requests</h6>
+                        </div>
+                        <div class="bg-light rounded-3 p-3">
+                            <p class="mb-0 text-dark"><%= booking.specialRequests %></p>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Enhanced Action buttons -->
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-lightning text-warning fs-5"></i>
+                        </div>
+                        <h6 class="card-title mb-0 fw-bold">Quick Actions</h6>
+                    </div>
+                    
+                    <% if(currUser._id.toString() === booking.host._id.toString()) { %>
+                        <!-- Host actions -->
+                        <% if(booking.status === 'pending') { %>
+                            <div class="alert alert-info border-0 rounded-3 mb-3">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Action Required:</strong> Please review and respond to this booking request.
+                            </div>
+                            <div class="d-flex gap-3 flex-wrap">
+                                <form method="POST" action="/bookings/<%= booking._id %>/status?_method=PUT" class="flex-grow-1">
+                                    <input type="hidden" name="status" value="confirmed">
+                                    <button type="submit" class="btn btn-success btn-lg w-100 rounded-3">
+                                        <i class="bi bi-check-circle me-2"></i>Confirm Booking
+                                    </button>
+                                </form>
+                                <form method="POST" action="/bookings/<%= booking._id %>/status?_method=PUT" class="flex-grow-1">
+                                    <input type="hidden" name="status" value="cancelled">
+                                    <button type="submit" class="btn btn-outline-danger btn-lg w-100 rounded-3">
+                                        <i class="bi bi-x-circle me-2"></i>Decline Booking
+                                    </button>
+                                </form>
+                            </div>
+                        <% } else { %>
+                            <div class="text-center py-3">
+                                <i class="bi bi-check-circle-fill text-success fs-1 mb-2 d-block"></i>
+                                <p class="text-muted mb-0 fs-5">Booking has been <strong><%= booking.status %></strong></p>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <!-- Guest actions -->
+                        <% if(booking.status === 'pending' || booking.status === 'confirmed') { %>
+                            <div class="d-flex gap-3 flex-wrap">
+                                <% if(booking.paymentStatus === 'pending' && booking.status === 'confirmed') { %>
+                                    <div class="flex-grow-1">
+                                        <a href="/payments/booking/<%= booking._id %>" class="btn btn-primary btn-lg w-100 rounded-3">
+                                            <i class="bi bi-credit-card me-2"></i>Complete Payment
+                                        </a>
+                                    </div>
+                                <% } %>
+                                <% if(booking.status !== 'cancelled') { %>
+                                    <div class="flex-grow-1">
+                                        <form method="POST" action="/bookings/<%= booking._id %>/cancel" onsubmit="return confirm('Are you sure you want to cancel this booking? This action cannot be undone.')">
+                                            <button type="submit" class="btn btn-outline-danger btn-lg w-100 rounded-3">
+                                                <i class="bi bi-x-circle me-2"></i>Cancel Booking
+                                            </button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% } else { %>
+                            <div class="text-center py-3">
+                                <i class="bi bi-<%= booking.status === 'cancelled' ? 'x-circle-fill text-danger' : 'check-circle-fill text-success' %> fs-1 mb-2 d-block"></i>
+                                <p class="text-muted mb-0 fs-5">Booking has been <strong><%= booking.status %></strong></p>
+                            </div>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Enhanced Host/Guest Information -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-body p-4">
+                    <% if(currUser._id.toString() === booking.host._id.toString()) { %>
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="bi bi-person text-primary"></i>
+                            </div>
+                            <h6 class="card-title mb-0 fw-bold">Guest Information</h6>
+                        </div>
+                        <div class="d-flex align-items-start">
+                            <div class="me-3">
+                                <% if(booking.guest.profile && booking.guest.profile.profilePicture) { %>
+                                    <img src="<%= booking.guest.profile.profilePicture.url %>" 
+                                         class="rounded-circle shadow-sm" width="70" height="70" alt="Guest">
+                                <% } else { %>
+                                    <div class="bg-gradient-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                                         style="width: 70px; height: 70px;">
+                                        <i class="bi bi-person text-white fs-4"></i>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fw-bold text-dark"><%= booking.guest.username %></h6>
+                                <% if(booking.guest.profile && booking.guest.profile.firstName) { %>
+                                    <p class="mb-1 text-muted">
+                                        <%= booking.guest.profile.firstName %> <%= booking.guest.profile.lastName %>
+                                    </p>
+                                <% } %>
+                                <div class="d-flex align-items-center text-muted small">
+                                    <i class="bi bi-envelope me-1"></i>
+                                    <%= booking.guest.email %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="bi bi-house text-success"></i>
+                            </div>
+                            <h6 class="card-title mb-0 fw-bold">Your Host</h6>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="me-3">
+                                <% if(booking.host.profile && booking.host.profile.profilePicture) { %>
+                                    <img src="<%= booking.host.profile.profilePicture.url %>" 
+                                         class="rounded-circle shadow-sm" width="70" height="70" alt="Host">
+                                <% } else { %>
+                                    <div class="bg-gradient-success rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                                         style="width: 70px; height: 70px;">
+                                        <i class="bi bi-person text-white fs-4"></i>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fw-bold text-dark"><%= booking.host.username %></h6>
+                                <% if(booking.host.profile && booking.host.profile.firstName) { %>
+                                    <p class="mb-1 text-muted">
+                                        <%= booking.host.profile.firstName %> <%= booking.host.profile.lastName %>
+                                    </p>
+                                <% } %>
+                                <% if(booking.host.host && booking.host.host.hostSince) { %>
+                                    <div class="d-flex align-items-center text-muted small mb-2">
+                                        <i class="bi bi-calendar me-1"></i>
+                                        Host since <%= new Date(booking.host.host.hostSince).getFullYear() %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <a href="/profile/<%= booking.host._id %>" class="btn btn-outline-primary rounded-3">
+                                <i class="bi bi-eye me-2"></i>View Host Profile
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Enhanced Booking Timeline -->
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                            <i class="bi bi-clock-history text-info"></i>
+                        </div>
+                        <h6 class="card-title mb-0 fw-bold">Booking Timeline</h6>
+                    </div>
+                    <div class="timeline position-relative">
+                        <div class="timeline-item d-flex align-items-start mb-3">
+                            <div class="timeline-marker bg-primary rounded-circle me-3 mt-1" style="width: 12px; height: 12px;"></div>
+                            <div class="timeline-content">
+                                <small class="text-primary fw-semibold">
+                                    <%= new Date(booking.createdAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) %>
+                                </small>
+                                <p class="mb-1 fw-semibold">Booking Request Submitted</p>
+                                <small class="text-muted">Initial booking request created</small>
+                            </div>
+                        </div>
+                        <% if(booking.status !== 'pending') { %>
+                            <div class="timeline-item d-flex align-items-start">
+                                <div class="timeline-marker bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'cancelled' ? 'danger' : 'secondary' %> rounded-circle me-3 mt-1" 
+                                     style="width: 12px; height: 12px;"></div>
+                                <div class="timeline-content">
+                                    <small class="text-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'cancelled' ? 'danger' : 'secondary' %> fw-semibold">
+                                        <%= new Date(booking.updatedAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) %>
+                                    </small>
+                                    <p class="mb-1 fw-semibold">Booking <%= booking.status.charAt(0).toUpperCase() + booking.status.slice(1) %></p>
+                                    <small class="text-muted">Status updated by host</small>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 12px;
+    bottom: 12px;
+    width: 2px;
+    background: linear-gradient(to bottom, #007bff, #6c757d);
+    opacity: 0.3;
+}
+
+.timeline-item:last-child::after {
+    display: none;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+}
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+</style>
